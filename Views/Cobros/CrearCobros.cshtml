@@ -1,0 +1,106 @@
+﻿@model PVI_Final_Condominios.Models.CobrosModels
+@{
+    ViewBag.Title = "CrearCobros";
+}
+
+<h2>Crear Cobros</h2>
+
+<form method="post" id="myform">
+    @Html.HiddenFor(model => model.idcobro)
+    <div class="md-3">
+        <label class="form-label" for="idCliente">Cliente</label>
+        <select id="idCliente" name="idCliente" class="form-control">
+            <option value="">Seleccione un cliente</option>
+        </select>
+    </div>
+
+    <div class="md-3">
+        <label class="form-label" for="idCasa">Casa</label>
+        <select id="idCasa" name="idCasa" class="form-control">
+            <option value="">Seleccione una casa</option>
+        </select>
+    </div>
+
+    <div class="md-3">
+        <label for="anioSeleccionado">Año</label>
+        @Html.DropDownListFor(m => m.anno,(IEnumerable<SelectListItem>)ViewBag.anno,"Seleccione un año",new { @class = "form-control" }) 
+    </div>
+
+    <div class="md-3">
+        <label class="form-label" for="mes">Mes</label>
+        @Html.DropDownListFor(m => m.mes, (IEnumerable<SelectListItem>)ViewBag.meses,"Seleccione un mes", new { @class = "form-control" })
+    </div>
+
+    <input type="submit" class="btn btn-primary" value="Guardar" />
+
+</form>
+
+@ViewBag.resultado
+
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/ValidacionesGenericas 1.js"></script>
+    <script type="text/javascript">
+        $("#myform").validate({
+            rules: {
+                'idCliente': {
+                    required: true
+                },
+                'idCasa': {
+                    required: true,
+                },
+                'anno': {
+                    required: true
+                },
+                'costo': {
+                    required: true
+                },
+                'mes': {
+                    required: true
+                }
+            }
+        });
+
+        function cleanDropdown(ddl) {
+            ddl.empty();
+            ddl.append("<option value=''>Seleccione una opcion</option>");
+        };
+
+        function loadDropdown(url, parametros, ddl, selected) {//Parametros que va a recibir nuestra funcion
+            $.post(url, parametros, function (data) {//Elegimos el metodo por el que sera enviado
+                ddl.empty();//Vaciamos el ddl
+                ddl.append("<option value=''>Seleccione una opcion</option");
+                $(data).each(function () {
+                    var option = new Option(this.Nombre, this.Id);
+                    if (this.Id == selected) {
+                        option.selected = true;
+                    }
+                    ddl.append(option);
+                });
+            });
+        };
+
+        function setChanges() {
+            $("#idCliente").change(function () {
+                loadDropdown("/Cobros/DdlCasas", { Id: $("#idCliente").val() }, $("#idCasa"));
+                cleanDropdown($("#idCasa"));
+            });
+
+
+        };
+
+        $(document).ready(function () {
+            var idcobro = @((this.Model != null) ? this.Model.idcobro : 0);
+            var idcasa =@((this.Model !=null) ? this.Model.idcasa :0 );
+
+            loadDropdown("/Cobros/DdlClientes", {}, $("#idCliente"), idcobro);
+            if (idcasa != 0) {
+                loadDropdown("/Cobros/DdlCasas", { Id: idcobro }, $("#idCasa"), idcasa);
+            }
+
+        setChanges();
+        });
+
+
+
+    </script>}

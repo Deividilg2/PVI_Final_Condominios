@@ -11,6 +11,7 @@
 
 		MyProject
 			DataModels
+
 				MyDatabase.tt
 
 	2. Modify the connection settings below to connect to your database.
@@ -116,7 +117,7 @@
 
 	// to configure GetSchemaOptions properties, add them here, before load metadata call
 
-	LoadSqlServerMetadata("MyServer", "MyDatabase", "User", "Password");
+	LoadSqlServerMetadata("DEIVIDILG\\DEIVIDILG", "PVI_ProyectoFinal");
 //	LoadSqlServerMetadata(".", "MyDatabase"); // Integrated Security
 //	LoadSqlServerMetadata(string connectionString);
 
