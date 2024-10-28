@@ -2,19 +2,37 @@
 using PVI_Final_Condominios.Models;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using static DataModels.PviProyectoFinalDBStoredProcedures;
 
 namespace PVI_Final_Condominios.Controllers
 {
     public class CobrosController : Controller
     {
         // GET: Cobros
-        public ActionResult Index()
+        public ActionResult ConsultarCobros()
         {
+            //Creamos una variable para almacenar los atributos del modelo
+            var cobrosList = new List<CobrosModels>();
+            var list = new List<SpConsultarCobrosResult>();//Variable para almacenar los datos del SP de los empleados
+            try
+            {
+                using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
+                {
 
-            return View();
+                    list = db.SpConsultarCobros().ToList();//Almacenamos el resultado, del SP
+
+                }
+            }
+            catch
+            {
+
+            }
+
+            return View(list);//Pasamos la lista del modelo
         }
         
         //Creamos este metodo para poder realizar la carga en caso de modificacion de datos
@@ -37,22 +55,35 @@ namespace PVI_Final_Condominios.Controllers
                         nombreCliente = _.Nombre,
 
                     }).FirstOrDefault();//Especificamos que nos devuelva el primer resultado que deberia ser el unico
+                   
+                    ViewBag.servicios = db.SpConsultarServicioscbx().ToList();
+                    Fechas(cobro);
 
-                    //Creamos un Enumerable y le generamos una secuencia con un rango de numeros enteros, empieza en 2024 contandolo y genera 11 numeros.
-                    ViewBag.anno = Enumerable.Range(2024, 11).Select(a => new SelectListItem//Toma cada numero y lo vuelve un elemento individual de la lista 
+                }
+            }
+            catch
+            {
+            }
+            return View(cobro);
+        }
+
+        public void Fechas(CobrosModels cobro)
+        {
+            //Creamos un Enumerable y le generamos una secuencia con un rango de numeros enteros, empieza en 2024 contandolo y genera 11 numeros.
+            ViewBag.Anno = Enumerable.Range(2024, 11).Select(a => new SelectListItem//Toma cada numero y lo vuelve un elemento individual de la lista 
+            {
+                Value = a.ToString(),//Convertimos el año "a" en string ya que el ddl solo admite string y lo asignamos como el valor
+                Text = a.ToString(),//Convierte el numero a una cadena para mostrarlo al usuario tambien
+                Selected = (cobro != null && a == cobro.anno)
+                //Solo en caso de que el año se encuentre en la lista creada y coincida con el año que viene de la bd se seleccionara
+            }).OrderBy(a => a.Text).ToList();//Ordenamos de forma ascendente y lo volvemos una lista
+
+
+            //Creacion de la lista de meses
+            // Crear la lista de meses
+            ViewBag.meses = new List<SelectListItem>
                     {
-                        Value = a.ToString(),//Convertimos el año "a" en string ya que el ddl solo admite string y lo asignamos como el valor
-                        Text = a.ToString(),//Convierte el numero a una cadena para mostrarlo al usuario tambien
-                        Selected = (cobro != null && a == cobro.anno)//establece si el elemento debe estar seleccionado por defecto
-                        //Solo en caso de que el año se encuentre en la lista creada y coincida con el año que viene de la bd se seleccionara
-                    }).OrderBy(a => a.Text).ToList();//Ordenamos de forma ascendente y lo volvemos una lista
 
-
-                    //Creacion de la lista de meses
-                    // Crear la lista de meses
-                    ViewBag.meses = new List<SelectListItem>
-                    {
-                        
                         new SelectListItem { Value = "1", Text = "Enero" },
                         new SelectListItem { Value = "2", Text = "Febrero" },
                         new SelectListItem { Value = "3", Text = "Marzo" },
@@ -66,16 +97,7 @@ namespace PVI_Final_Condominios.Controllers
                         new SelectListItem { Value = "11", Text = "Noviembre" },
                         new SelectListItem { Value = "12", Text = "Diciembre" }
                     };
-
-                }
-            }
-            catch
-            {
-            }
-            return View(cobro);
         }
-
-
 
         public ActionResult ModificarCobros(CobrosModels cobro)
         {
@@ -137,5 +159,7 @@ namespace PVI_Final_Condominios.Controllers
             }
             return Json(list);
         }
+
+
     }
 }

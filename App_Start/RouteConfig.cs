@@ -16,7 +16,7 @@ namespace PVI_Final_Condominios
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Cobros", action = "CrearCobros", id = UrlParameter.Optional }
+                defaults: new { controller = "Cobros", action = "ConsultarCobros", id = UrlParameter.Optional }
             );
         }
     }

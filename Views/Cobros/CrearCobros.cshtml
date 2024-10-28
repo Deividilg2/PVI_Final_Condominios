@@ -23,15 +23,26 @@
 
     <div class="md-3">
         <label for="anioSeleccionado">Año</label>
-        @Html.DropDownListFor(m => m.anno,(IEnumerable<SelectListItem>)ViewBag.anno,"Seleccione un año",new { @class = "form-control" }) 
+        @Html.DropDownList("annoSeleccionado", (IEnumerable<SelectListItem>)ViewBag.Anno, "Seleccione un año", new { @class = "form-control" })
+        @*Solo ha funcionado la carga del año mediante la lista creada en controller con DDList*@
     </div>
 
     <div class="md-3">
         <label class="form-label" for="mes">Mes</label>
-        @Html.DropDownListFor(m => m.mes, (IEnumerable<SelectListItem>)ViewBag.meses,"Seleccione un mes", new { @class = "form-control" })
+        @Html.DropDownListFor(model => model.mes, (IEnumerable<SelectListItem>)ViewBag.meses,"Seleccione un mes", new { @class = "form-control" })
     </div>
 
-    <input type="submit" class="btn btn-primary" value="Guardar" />
+    @*<div>
+        @foreach (var servicio in ViewBag.servicios)
+        {
+            <div>
+                <input type="checkbox" name="serviciosSeleccionados" value="@servicio.IdServicio" />
+                <label>@servicio.NombreCategoria - @servicio.Nombre</label>
+            </div>
+        }
+        </div>*@
+
+            <input type="submit" class="btn btn-primary" value="Guardar" />
 
 </form>
 

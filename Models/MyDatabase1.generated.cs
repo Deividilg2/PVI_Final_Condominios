@@ -378,9 +378,21 @@ namespace DataModels
 
 		#region SpConsultarCobros
 
-		public static IEnumerable<Cobro> SpConsultarCobros(this PviProyectoFinalDB dataConnection)
+		public static IEnumerable<SpConsultarCobrosResult> SpConsultarCobros(this PviProyectoFinalDB dataConnection)
 		{
-			return dataConnection.QueryProc<Cobro>("[dbo].[sp_ConsultarCobros]");
+			return dataConnection.QueryProc<SpConsultarCobrosResult>("[dbo].[sp_ConsultarCobros]");
+		}
+
+		public partial class SpConsultarCobrosResult
+		{
+			[Column("id_cobro")    ] public int       Id_cobro     { get; set; }
+			[Column("id_casa")     ] public int       Id_casa      { get; set; }
+			[Column("nombre")      ] public string    Nombre       { get; set; }
+			[Column("mes")         ] public int       Mes          { get; set; }
+			[Column("anno")        ] public int       Anno         { get; set; }
+			[Column("estado")      ] public string    Estado       { get; set; }
+			[Column("monto")       ] public decimal?  Monto        { get; set; }
+			[Column("fecha_pagada")] public DateTime? Fecha_pagada { get; set; }
 		}
 
 		#endregion
@@ -430,9 +442,29 @@ namespace DataModels
 
 		#region SpConsultarServicios
 
-		public static IEnumerable<Servicio> SpConsultarServicios(this PviProyectoFinalDB dataConnection)
+		public static IEnumerable<SpConsultarServiciosResult> SpConsultarServicios(this PviProyectoFinalDB dataConnection)
 		{
-			return dataConnection.QueryProc<Servicio>("[dbo].[sp_ConsultarServicios]");
+			var ms = dataConnection.MappingSchema;
+
+			return dataConnection.QueryProc(dataReader =>
+				new SpConsultarServiciosResult
+				{
+					Id_servicio  = Converter.ChangeTypeTo<int>    (dataReader.GetValue(0), ms),
+					Nombre       = Converter.ChangeTypeTo<string> (dataReader.GetValue(1), ms),
+					Precio       = Converter.ChangeTypeTo<decimal>(dataReader.GetValue(2), ms),
+					Id_categoria = Converter.ChangeTypeTo<int>    (dataReader.GetValue(3), ms),
+					Column5      = Converter.ChangeTypeTo<string> (dataReader.GetValue(4), ms),
+				},
+				"[dbo].[sp_ConsultarServicios]");
+		}
+
+		public partial class SpConsultarServiciosResult
+		{
+			[Column("id_servicio") ] public int     Id_servicio  { get; set; }
+			[Column("nombre")      ] public string  Nombre       { get; set; }
+			[Column("precio")      ] public decimal Precio       { get; set; }
+			[Column("id_categoria")] public int     Id_categoria { get; set; }
+			[Column("nombre")      ] public string  Column5      { get; set; }
 		}
 
 		#endregion
