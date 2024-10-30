@@ -473,7 +473,17 @@ namespace DataModels
 
 		public static IEnumerable<SpConsultarServicioscbxResult> SpConsultarServicioscbx(this PviProyectoFinalDB dataConnection)
 		{
-			return dataConnection.QueryProc<SpConsultarServicioscbxResult>("[dbo].[sp_ConsultarServicioscbx]");
+			var ms = dataConnection.MappingSchema;
+
+			return dataConnection.QueryProc(dataReader =>
+				new SpConsultarServicioscbxResult
+				{
+					Id_servicio  = Converter.ChangeTypeTo<int>   (dataReader.GetValue(0), ms),
+					Id_categoria = Converter.ChangeTypeTo<int>   (dataReader.GetValue(1), ms),
+					Nombre       = Converter.ChangeTypeTo<string>(dataReader.GetValue(2), ms),
+					Column4      = Converter.ChangeTypeTo<string>(dataReader.GetValue(3), ms),
+				},
+				"[dbo].[sp_ConsultarServicioscbx]");
 		}
 
 		public partial class SpConsultarServicioscbxResult
@@ -481,6 +491,7 @@ namespace DataModels
 			[Column("id_servicio") ] public int    Id_servicio  { get; set; }
 			[Column("id_categoria")] public int    Id_categoria { get; set; }
 			[Column("nombre")      ] public string Nombre       { get; set; }
+			[Column("nombre")      ] public string Column4      { get; set; }
 		}
 
 		#endregion
