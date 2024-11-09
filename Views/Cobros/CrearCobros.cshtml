@@ -44,7 +44,7 @@
                 <input type="checkbox" id="servicioSeleccionado_@servicio.Id_servicio" name="@servicio.Id_servicio" value="@servicio.Id_servicio" 
                        @if(ViewBag.serviciosSeleccionados != null)
                 {//Codigo que nos permite tomar la lista almacenada en el viewbag para seleccionar los checkbox
-                    @( ((List<int>)ViewBag.serviciosSeleccionados).Contains(servicio.Id_servicio) ? "checked" : "")
+                    @((ViewBag.serviciosSeleccionados).Contains(servicio.Id_servicio) ? "checked" : "")
                 }
                        />
                 <label class="form-label" for="servicioSeleccionado_@servicio.Id_servicio">@servicio.Column4 : @servicio.Nombre</label>

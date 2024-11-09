@@ -14,7 +14,5 @@ namespace PVI_Final_Condominios.Models
         public string estado { get; set; }
         public decimal monto { get; set; }
 
-
-        public bool estadoCbx { get; set; }
     }
 }

@@ -51,7 +51,6 @@ namespace PVI_Final_Condominios.Controllers
                         anno = _.Anno,
                         estado = _.Estado,
                         monto = (decimal)_.Monto
-                        
                     }).FirstOrDefault();//Especificamos que nos devuelva el primer resultado que deberia ser el unico
                     ServiciosyddlsdeFechas(cobro);//Metodo que nos permite cargar la lista de los años, meses y los servicios en los Checkbox
 
@@ -63,22 +62,7 @@ namespace PVI_Final_Condominios.Controllers
             return View(cobro);
         }
 
-        public JsonResult ServiciosdeCobro(int? id)
-        {
-            var list = new List<Checkbox>();//Variable que va a guardar la estructura del modelo DDL
-            try
-            {
-                using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
-                {//Almacenamos en list los id y nombres de las casas para el ddl de la vista
-                    ViewBag.serviciosdecobro = db.SpConsultarServiciosporCobro(id).Select(_ => new Checkbox { id_servicio = _.Id_servicio }).ToList();
-                }
-
-            }
-            catch 
-            {
-            }
-            return Json(list);
-        }
+       
 
         public void ServiciosyddlsdeFechas(CobrosModels cobro)
         {
@@ -99,7 +83,6 @@ namespace PVI_Final_Condominios.Controllers
                 // Crear la lista de meses
                 ViewBag.meses = new List<SelectListItem>
                     {
-
                         new SelectListItem { Value = "1", Text = "Enero" },
                         new SelectListItem { Value = "2", Text = "Febrero" },
                         new SelectListItem { Value = "3", Text = "Marzo" },
@@ -115,9 +98,7 @@ namespace PVI_Final_Condominios.Controllers
                     };
                 ViewBag.servicios = db.SpConsultarServicioscbx().ToList();
                 ViewBag.serviciosSeleccionados = db.SpConsultarServiciosporCobro(cobro.idcobro).Select(s => s.Id_servicio).ToList();
-
             }
-                
         }
 
         [HttpPost]
@@ -151,30 +132,7 @@ namespace PVI_Final_Condominios.Controllers
             }
             return View();
         }
-        //Cobro = ( Precio de la Casa / Metros Cuadrados ) + Precio de cada servicio seleccionado. 
-        //public decimal Monto()
-        //{
-        //    decimal montoCobro = 0;
-        //    try
-        //    {
-
-        //        using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
-        //        {
-        //            var datos = db.
-
-                    
-        //            montoCobro = (datos.precio/datos.metros_cuadrados)+
-        //        }
-        //    }
-        //    catch
-        //    {
-
-        //    }
-            
-
-
-        //    return montoCobro;
-        //}
+       
 
         public JsonResult DdlClientes()
         {//Ddl que usamos para cargar a los clientes activos
