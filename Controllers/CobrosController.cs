@@ -1,9 +1,12 @@
 ﻿using DataModels;
+using Microsoft.Ajax.Utilities;
 using PVI_Final_Condominios.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using static DataModels.PviProyectoFinalDBStoredProcedures;
@@ -49,8 +52,7 @@ namespace PVI_Final_Condominios.Controllers
                         idcasa = _.Id_casa,
                         mes = _.Mes,
                         anno = _.Anno,
-                        estado = _.Estado,
-                        monto = (decimal)_.Monto
+                        estado = _.Estado
                     }).FirstOrDefault();//Especificamos que nos devuelva el primer resultado que deberia ser el unico
                     ServiciosyddlsdeFechas(cobro);//Metodo que nos permite cargar la lista de los años, meses y los servicios en los Checkbox
 
@@ -62,7 +64,131 @@ namespace PVI_Final_Condominios.Controllers
             return View(cobro);
         }
 
-       
+         
+
+        [HttpPost]
+        public ActionResult CrearCobros(CobrosModels cobro, List<int> servicioSeleccionado)
+        {
+            string resultado = String.Empty;
+
+            try
+            {//Conexion a la base de datps
+                using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
+                {//Buscamos que no exista nningun registro de una casa con estado "Pendiente"
+                    var estadoCasa = db.SpConsultarEstadoCasaporPersona(cobro.idcasa,cobro.mes,cobro.anno).FirstOrDefault();
+                    ViewBag.Estadocasa = estadoCasa;//Almacenamos dentro del ViewBag para pasarlo a la alerta en la vista
+                    //Validamos que se inserte solo en el caso de que no existan registros pendientes en la casa seleccionada
+                    if (cobro.idcobro == 0 && estadoCasa == null)
+                    {
+                       
+                        db.SpInsertarCobro(cobro.idcasa, cobro.mes, cobro.anno, MontoServicios(servicioSeleccionado));//Tomamos el monto de una funcion
+                        InsertarServiciosCobro(servicioSeleccionado, cobro, MontoServicios(servicioSeleccionado));//Realizamos el insert de los servicios en la tabla detallecobroos
+                        ViewBag.resultado = "Se ha logrado guardar con exito";
+
+                    }
+                    else if(cobro.idcobro != 0)
+                    {
+                        db.SpModificarCobro(cobro.idcobro, cobro.idcasa, cobro.mes, cobro.anno, cobro.estado, MontoServicios(servicioSeleccionado));
+                        InsertarServiciosCobro(servicioSeleccionado, cobro, MontoServicios(servicioSeleccionado));//Realizamos el insert de los servicios en la tabla detallecobroos
+                        ViewBag.resultado = "Se ha logrado modificar con exito";
+                    }
+                }
+                ServiciosyddlsdeFechas(cobro);//Cargamos los servicios y los ddl de anno y mes
+
+            }
+            catch
+            {
+            }
+            return View();
+        }
+
+        
+        
+
+        public JsonResult DdlClientes()
+        {//Ddl que usamos para cargar a los clientes activos
+            var list = new List<DropDownList>();//Variable que va a guardar la estructura del modelo DDL
+            try
+            {
+                using(var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
+                {//Almacenamos en list los id y nombres de las personas para el ddl de la vista
+                    list = db.SpConsultarPersona().Select(_ => new DropDownList { Id = _.IdPersona, Nombre = _.Nombre }).ToList();         
+                }
+            }
+            catch
+            {
+
+            }
+                return Json(list);
+        }
+
+        public JsonResult DdlCasas(int? id)
+        {//Ddl que usamos para traer las casas activas de un cliente especifico
+            var list = new List<DropDownList>();//Variable que va a guardar la estructura del modelo DDL
+            try
+            {
+                using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
+                {//Almacenamos en list los id y nombres de las casas para el ddl de la vista
+                    list = db.SpConsultarCasaddl(id).Select(_ => new DropDownList { Id = _.Id_casa, Nombre = _.Nombre_casa }).ToList();
+                }
+            }
+            catch
+            {
+
+            }
+            return Json(list);
+        }
+
+        public decimal MontoServicios(List<int> servicioSeleccionado)
+        {
+            decimal monto = 0;
+            try
+            {
+
+                if (servicioSeleccionado != null && servicioSeleccionado.Any())
+                {
+                    foreach (var servicioId in servicioSeleccionado)
+                    {
+                        using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
+                        {
+                            var valor = db.SpConsultarPrecioServicioporId(servicioId).FirstOrDefault();
+
+                            monto += valor.Precio;
+                        }
+                    }
+                }
+
+            }
+            catch
+            {
+            }
+            return monto;
+        }
+
+        public void InsertarServiciosCobro(List<int> servicioSeleccionado, CobrosModels cobro, decimal monto)
+        {
+            try
+            {
+                using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
+                {
+                    foreach (var servicioId in servicioSeleccionado)
+                    {
+                        ViewBag.serviciosSeleccionados = cobro != null ? //Tomamos los sercicios que ya estan seleccionados
+                    db.SpConsultarServiciosporCobro(cobro.idcobro).Select(s => s.Id_servicio).ToList() : null;
+                        var serviciosExistentes = ViewBag.serviciosSeleccionados;
+                        if (!serviciosExistentes.Contains(servicioId))
+                        {
+                            db.SpInsertarDetalleCobro(servicioId, cobro.idcobro, cobro.idcasa, cobro.mes, cobro.anno, monto);
+                        }
+
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+        }
 
         public void ServiciosyddlsdeFechas(CobrosModels cobro)
         {
@@ -97,75 +223,9 @@ namespace PVI_Final_Condominios.Controllers
                         new SelectListItem { Value = "12", Text = "Diciembre" }
                     };
                 ViewBag.servicios = db.SpConsultarServicioscbx().ToList();
-                ViewBag.serviciosSeleccionados = db.SpConsultarServiciosporCobro(cobro.idcobro).Select(s => s.Id_servicio).ToList();
+                ViewBag.serviciosSeleccionados = cobro != null ? //En caso de que se este insertando un nuevo cobro no genere un error
+                    db.SpConsultarServiciosporCobro(cobro.idcobro).Select(s => s.Id_servicio).ToList() : null;
             }
-        }
-
-        [HttpPost]
-        public ActionResult CrearCobros(CobrosModels cobro)
-        {
-            string resultado = String.Empty;
-
-            try
-            {//Conexion a la base de datps
-                using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
-                {//Buscamos que no exista nningun registro de una casa con estado "Pendiente"
-                    var estadoCasa = db.SpConsultarEstadoCasaporPersona(cobro.idcasa,cobro.mes,cobro.anno).FirstOrDefault();
-                    ViewBag.Estadocasa = estadoCasa;//Almacenamos dentro del ViewBag para pasarlo a la alerta en la vista
-                    //Validamos que se inserte solo en el caso de que no existan registros pendientes en la casa seleccionada
-                    if (cobro.idcobro == 0 && estadoCasa == null)
-                    {
-                        db.SpInsertarCobro(cobro.idcasa, cobro.mes, cobro.anno, cobro.monto);
-                        ViewBag.resultado = "Se ha logrado guardar con exito";
-                    }
-                    else if(cobro.idcobro != 0)
-                    {
-                        db.SpModificarCobro(cobro.idcobro, cobro.idcasa, cobro.mes, cobro.anno, cobro.estado, cobro.monto);
-                        ViewBag.resultado = "Se ha logrado modificar con exito";
-                    }
-                }
-                ServiciosyddlsdeFechas(cobro);//Cargamos los ddl de anno y mes
-
-            }
-            catch
-            {
-            }
-            return View();
-        }
-       
-
-        public JsonResult DdlClientes()
-        {//Ddl que usamos para cargar a los clientes activos
-            var list = new List<DropDownList>();//Variable que va a guardar la estructura del modelo DDL
-            try
-            {
-                using(var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
-                {//Almacenamos en list los id y nombres de las personas para el ddl de la vista
-                    list = db.SpConsultarPersona().Select(_ => new DropDownList { Id = _.IdPersona, Nombre = _.Nombre }).ToList();         
-                }
-            }
-            catch
-            {
-
-            }
-                return Json(list);
-        }
-
-        public JsonResult DdlCasas(int? id)
-        {//Ddl que usamos para traer las casas activas de un cliente especifico
-            var list = new List<DropDownList>();//Variable que va a guardar la estructura del modelo DDL
-            try
-            {
-                using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
-                {//Almacenamos en list los id y nombres de las casas para el ddl de la vista
-                    list = db.SpConsultarCasaddl(id).Select(_ => new DropDownList { Id = _.Id_casa, Nombre = _.Nombre_casa }).ToList();
-                }
-            }
-            catch
-            {
-
-            }
-            return Json(list);
         }
 
 

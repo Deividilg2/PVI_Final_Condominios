@@ -12,7 +12,6 @@ namespace PVI_Final_Condominios.Models
         public int mes { get; set; }
         public int anno { get; set; }
         public string estado { get; set; }
-        public decimal monto { get; set; }
 
     }
 }

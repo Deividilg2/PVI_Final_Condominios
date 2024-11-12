@@ -452,6 +452,25 @@ namespace DataModels
 
 		#endregion
 
+		#region SpConsultarPrecioServicioporId
+
+		public static IEnumerable<SpConsultarPrecioServicioporIdResult> SpConsultarPrecioServicioporId(this PviProyectoFinalDB dataConnection, int? @IdServicio)
+		{
+			var parameters = new []
+			{
+				new DataParameter("@IdServicio", @IdServicio, LinqToDB.DataType.Int32)
+			};
+
+			return dataConnection.QueryProc<SpConsultarPrecioServicioporIdResult>("[dbo].[sp_ConsultarPrecioServicioporId]", parameters);
+		}
+
+		public partial class SpConsultarPrecioServicioporIdResult
+		{
+			[Column("precio")] public decimal Precio { get; set; }
+		}
+
+		#endregion
+
 		#region SpConsultarServicios
 
 		public static IEnumerable<SpConsultarServiciosResult> SpConsultarServicios(this PviProyectoFinalDB dataConnection)
@@ -656,6 +675,25 @@ namespace DataModels
 			};
 
 			return dataConnection.ExecuteProc("[dbo].[sp_InsertarCobro]", parameters);
+		}
+
+		#endregion
+
+		#region SpInsertarDetalleCobro
+
+		public static int SpInsertarDetalleCobro(this PviProyectoFinalDB dataConnection, int? @IdServicio, int? @IdCobro, int? @IdCasa, int? @mes, int? @anno, decimal? @monto)
+		{
+			var parameters = new []
+			{
+				new DataParameter("@IdServicio", @IdServicio, LinqToDB.DataType.Int32),
+				new DataParameter("@IdCobro",    @IdCobro,    LinqToDB.DataType.Int32),
+				new DataParameter("@IdCasa",     @IdCasa,     LinqToDB.DataType.Int32),
+				new DataParameter("@mes",        @mes,        LinqToDB.DataType.Int32),
+				new DataParameter("@anno",       @anno,       LinqToDB.DataType.Int32),
+				new DataParameter("@monto",      @monto,      LinqToDB.DataType.Decimal)
+			};
+
+			return dataConnection.ExecuteProc("[dbo].[sp_InsertarDetalleCobro]", parameters);
 		}
 
 		#endregion
