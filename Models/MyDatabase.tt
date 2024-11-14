@@ -117,7 +117,7 @@
 
 	// to configure GetSchemaOptions properties, add them here, before load metadata call
 
-	LoadSqlServerMetadata("DEIVIDILG\\DEIVIDILG", "PVI_ProyectoFinal");
+	LoadSqlServerMetadata("SJSMWG984P0196\\SQLEXPRESS", "PVI_ProyectoFinal");
 //	LoadSqlServerMetadata(".", "MyDatabase"); // Integrated Security
 //	LoadSqlServerMetadata(string connectionString);
 

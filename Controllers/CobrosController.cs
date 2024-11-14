@@ -7,6 +7,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using static DataModels.PviProyectoFinalDBStoredProcedures;
+using static LinqToDB.Reflection.Methods.LinqToDB.Insert;
 
 namespace PVI_Final_Condominios.Controllers
 {

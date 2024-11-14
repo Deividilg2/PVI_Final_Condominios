@@ -22,8 +22,8 @@ namespace DataModels
 {
 	/// <summary>
 	/// Database       : PVI_ProyectoFinal
-	/// Data Source    : DEIVIDILG\DEIVIDILG
-	/// Server Version : 14.00.2065
+	/// Data Source    : SJSMWG984P0196\SQLEXPRESS
+	/// Server Version : 16.00.1000
 	/// </summary>
 	public partial class PviProyectoFinalDB : LinqToDB.Data.DataConnection
 	{
@@ -258,29 +258,6 @@ namespace DataModels
 
 	public static partial class PviProyectoFinalDBStoredProcedures
 	{
-		#region SpAlterdiagram
-
-		public static int SpAlterdiagram(this PviProyectoFinalDB dataConnection, string @diagramname, int? @ownerId, int? @version, byte[] @definition)
-		{
-			var parameters = new []
-			{
-				new DataParameter("@diagramname", @diagramname, LinqToDB.DataType.NVarChar)
-				{
-					Size = 128
-				},
-				new DataParameter("@owner_id",    @ownerId,     LinqToDB.DataType.Int32),
-				new DataParameter("@version",     @version,     LinqToDB.DataType.Int32),
-				new DataParameter("@definition",  @definition,  LinqToDB.DataType.VarBinary)
-				{
-					Size = -1
-				}
-			};
-
-			return dataConnection.ExecuteProc("[dbo].[sp_alterdiagram]", parameters);
-		}
-
-		#endregion
-
 		#region SpConsultarBitacora
 
 		public static IEnumerable<Bitacora> SpConsultarBitacora(this PviProyectoFinalDB dataConnection)
@@ -307,15 +284,6 @@ namespace DataModels
 			[Column("id_casa")    ] public int    Id_casa     { get; set; }
 			[Column("nombre_casa")] public string Nombre_casa { get; set; }
 			[Column("estado")     ] public bool?  Estado      { get; set; }
-		}
-
-		#endregion
-
-		#region SpConsultarCasas
-
-		public static IEnumerable<Casa> SpConsultarCasas(this PviProyectoFinalDB dataConnection)
-		{
-			return dataConnection.QueryProc<Casa>("[dbo].[sp_ConsultarCasas]");
 		}
 
 		#endregion
@@ -399,9 +367,46 @@ namespace DataModels
 
 		#region SpConsultarDetalleCobro
 
-		public static IEnumerable<DetalleCobro> SpConsultarDetalleCobro(this PviProyectoFinalDB dataConnection)
+		public static IEnumerable<SpConsultarDetalleCobroResult> SpConsultarDetalleCobro(this PviProyectoFinalDB dataConnection, int? @idCobro)
 		{
-			return dataConnection.QueryProc<DetalleCobro>("[dbo].[sp_ConsultarDetalleCobro]");
+			var parameters = new []
+			{
+				new DataParameter("@id_cobro", @idCobro, LinqToDB.DataType.Int32)
+			};
+
+			return dataConnection.QueryProc<SpConsultarDetalleCobroResult>("[dbo].[sp_ConsultarDetalleCobro]", parameters);
+		}
+
+		public partial class SpConsultarDetalleCobroResult
+		{
+			[Column("id_servicio")    ] public int      Id_servicio     { get; set; }
+			[Column("nombre_servicio")] public string   Nombre_servicio { get; set; }
+			[Column("precio_servicio")] public decimal  Precio_servicio { get; set; }
+			[Column("id_cobro")       ] public int      Id_cobro        { get; set; }
+			[Column("monto_cobro")    ] public decimal? Monto_cobro     { get; set; }
+			[Column("estado_cobro")   ] public string   Estado_cobro    { get; set; }
+			[Column("nombre_casa")    ] public string   Nombre_casa     { get; set; }
+		}
+
+		#endregion
+
+		#region SpConsultarEstadoCasaporPersona
+
+		public static IEnumerable<SpConsultarEstadoCasaporPersonaResult> SpConsultarEstadoCasaporPersona(this PviProyectoFinalDB dataConnection, int? @IdCasa, int? @mes, int? @anno)
+		{
+			var parameters = new []
+			{
+				new DataParameter("@IdCasa", @IdCasa, LinqToDB.DataType.Int32),
+				new DataParameter("@mes",    @mes,    LinqToDB.DataType.Int32),
+				new DataParameter("@anno",   @anno,   LinqToDB.DataType.Int32)
+			};
+
+			return dataConnection.QueryProc<SpConsultarEstadoCasaporPersonaResult>("[dbo].[sp_ConsultarEstadoCasaporPersona]", parameters);
+		}
+
+		public partial class SpConsultarEstadoCasaporPersonaResult
+		{
+			[Column("estado")] public string Estado { get; set; }
 		}
 
 		#endregion
@@ -496,94 +501,21 @@ namespace DataModels
 
 		#endregion
 
-		#region SpCreatediagram
+		#region SpConsultarServiciosporCobro
 
-		public static int SpCreatediagram(this PviProyectoFinalDB dataConnection, string @diagramname, int? @ownerId, int? @version, byte[] @definition)
+		public static IEnumerable<SpConsultarServiciosporCobroResult> SpConsultarServiciosporCobro(this PviProyectoFinalDB dataConnection, int? @idcobro)
 		{
 			var parameters = new []
 			{
-				new DataParameter("@diagramname", @diagramname, LinqToDB.DataType.NVarChar)
-				{
-					Size = 128
-				},
-				new DataParameter("@owner_id",    @ownerId,     LinqToDB.DataType.Int32),
-				new DataParameter("@version",     @version,     LinqToDB.DataType.Int32),
-				new DataParameter("@definition",  @definition,  LinqToDB.DataType.VarBinary)
-				{
-					Size = -1
-				}
+				new DataParameter("@idcobro", @idcobro, LinqToDB.DataType.Int32)
 			};
 
-			return dataConnection.ExecuteProc("[dbo].[sp_creatediagram]", parameters);
+			return dataConnection.QueryProc<SpConsultarServiciosporCobroResult>("[dbo].[sp_ConsultarServiciosporCobro]", parameters);
 		}
 
-		#endregion
-
-		#region SpDropdiagram
-
-		public static int SpDropdiagram(this PviProyectoFinalDB dataConnection, string @diagramname, int? @ownerId)
+		public partial class SpConsultarServiciosporCobroResult
 		{
-			var parameters = new []
-			{
-				new DataParameter("@diagramname", @diagramname, LinqToDB.DataType.NVarChar)
-				{
-					Size = 128
-				},
-				new DataParameter("@owner_id",    @ownerId,     LinqToDB.DataType.Int32)
-			};
-
-			return dataConnection.ExecuteProc("[dbo].[sp_dropdiagram]", parameters);
-		}
-
-		#endregion
-
-		#region SpHelpdiagramdefinition
-
-		public static IEnumerable<SpHelpdiagramdefinitionResult> SpHelpdiagramdefinition(this PviProyectoFinalDB dataConnection, string @diagramname, int? @ownerId)
-		{
-			var parameters = new []
-			{
-				new DataParameter("@diagramname", @diagramname, LinqToDB.DataType.NVarChar)
-				{
-					Size = 128
-				},
-				new DataParameter("@owner_id",    @ownerId,     LinqToDB.DataType.Int32)
-			};
-
-			return dataConnection.QueryProc<SpHelpdiagramdefinitionResult>("[dbo].[sp_helpdiagramdefinition]", parameters);
-		}
-
-		public partial class SpHelpdiagramdefinitionResult
-		{
-			[Column("version")   ] public int?   Version    { get; set; }
-			[Column("definition")] public byte[] Definition { get; set; }
-		}
-
-		#endregion
-
-		#region SpHelpdiagrams
-
-		public static IEnumerable<SpHelpdiagramsResult> SpHelpdiagrams(this PviProyectoFinalDB dataConnection, string @diagramname, int? @ownerId)
-		{
-			var parameters = new []
-			{
-				new DataParameter("@diagramname", @diagramname, LinqToDB.DataType.NVarChar)
-				{
-					Size = 128
-				},
-				new DataParameter("@owner_id",    @ownerId,     LinqToDB.DataType.Int32)
-			};
-
-			return dataConnection.QueryProc<SpHelpdiagramsResult>("[dbo].[sp_helpdiagrams]", parameters);
-		}
-
-		public partial class SpHelpdiagramsResult
-		{
-			public string Database { get; set; }
-			public string Name     { get; set; }
-			public int    ID       { get; set; }
-			public string Owner    { get; set; }
-			public int    OwnerID  { get; set; }
+			[Column("id_servicio")] public int Id_servicio { get; set; }
 		}
 
 		#endregion
@@ -676,28 +608,6 @@ namespace DataModels
 			};
 
 			return dataConnection.ExecuteProc("[dbo].[sp_ModificarCobro]", parameters);
-		}
-
-		#endregion
-
-		#region SpRenamediagram
-
-		public static int SpRenamediagram(this PviProyectoFinalDB dataConnection, string @diagramname, int? @ownerId, string @newDiagramname)
-		{
-			var parameters = new []
-			{
-				new DataParameter("@diagramname",     @diagramname,    LinqToDB.DataType.NVarChar)
-				{
-					Size = 128
-				},
-				new DataParameter("@owner_id",        @ownerId,        LinqToDB.DataType.Int32),
-				new DataParameter("@new_diagramname", @newDiagramname, LinqToDB.DataType.NVarChar)
-				{
-					Size = 128
-				}
-			};
-
-			return dataConnection.ExecuteProc("[dbo].[sp_renamediagram]", parameters);
 		}
 
 		#endregion

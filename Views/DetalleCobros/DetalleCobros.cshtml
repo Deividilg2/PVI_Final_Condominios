@@ -1,0 +1,19 @@
+﻿@model List<DataModels.PviProyectoFinalDBStoredProcedures.SpConsultarDetalleCobroResult>
+
+@{
+    ViewBag.Title = "DetalleCobros";
+}
+
+<h2>Detalle del Cobro</h2>
+
+<div>
+    <p><strong>Número de Cobro:</strong>@PVI_Final_Condominios.Models.DetalleCobrosModels   </p>
+    <p><strong>Casa:</strong> @Model.Casa.nombre_casa</p>
+    <p><strong>Fecha de Emisión:</strong> @Model.FechaEmision.ToShortDateString()</p>
+    <p><strong>Fecha de Vencimiento:</strong> @Model.FechaVencimiento.ToShortDateString()</p>
+    <p><strong>Monto:</strong> @Model.Monto</p>
+    <p><strong>Estado:</strong> @Model.Estado</p>
+
+    @* *@
+</div>
+

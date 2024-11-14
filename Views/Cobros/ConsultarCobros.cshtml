@@ -6,23 +6,6 @@
 
 <h2>Consultar Cobros</h2>
 
-@*<div class="md-3">
-    <label class="form-label" for="idCasa">Casa</label>
-    <select id="idCasa" name="idCasa" class="form-control">
-    <option value="">Seleccione una casa</option>
-    </select>
-    </div>
-
-    <div class="md-3">
-    <label for="anioSeleccionado">Año</label>
-        @Html.DropDownListFor(m => m.anno, (IEnumerable<SelectListItem>)ViewBag.anno, "Seleccione un año", new { @class = "form-control" })
-    </div>
-
-    <div class="md-3">
-    <label class="form-label" for="mes">Mes</label>
-        @Html.DropDownListFor(m => m.mes, (IEnumerable<SelectListItem>)ViewBag.meses, "Seleccione un mes", new { @class = "form-control" })
-    </div>*@
-
 @Html.ActionLink("Crear cobro", "CrearCobros", null, new { @class = "btn btn-primary" })
 <table class="table table-bordered table-hover">
     <tr>
@@ -46,3 +29,5 @@
 
 
 </table>
+
+
