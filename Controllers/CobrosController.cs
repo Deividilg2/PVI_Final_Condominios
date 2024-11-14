@@ -49,6 +49,7 @@ namespace PVI_Final_Condominios.Controllers
                     cobro = db.SpConsultarCobroporId(id).Select(_ => new CobrosModels
                     {//Mapeamos los datos al modelo
                         idcobro = _.Id_cobro,
+                        idCliente = _.Id_persona,
                         idcasa = _.Id_casa,
                         mes = _.Mes,
                         anno = _.Anno,
@@ -81,15 +82,16 @@ namespace PVI_Final_Condominios.Controllers
                     if (cobro.idcobro == 0 && estadoCasa == null)
                     {
                        
-                        db.SpInsertarCobro(cobro.idcasa, cobro.mes, cobro.anno, MontoServicios(servicioSeleccionado));//Tomamos el monto de una funcion
-                        InsertarServiciosCobro(servicioSeleccionado, cobro, MontoServicios(servicioSeleccionado));//Realizamos el insert de los servicios en la tabla detallecobroos
+                        db.SpInsertarCobro(cobro.idcasa, cobro.mes, cobro.anno, MontoServicios(servicioSeleccionado, cobro));//Tomamos el monto de una funcion
+                        InsertarServiciosCobro(servicioSeleccionado, cobro, MontoServicios(servicioSeleccionado, cobro));//Realizamos el insert de los servicios en la tabla detallecobroos
                         ViewBag.resultado = "Se ha logrado guardar con exito";
 
                     }
                     else if(cobro.idcobro != 0)
                     {
-                        db.SpModificarCobro(cobro.idcobro, cobro.idcasa, cobro.mes, cobro.anno, cobro.estado, MontoServicios(servicioSeleccionado));
-                        InsertarServiciosCobro(servicioSeleccionado, cobro, MontoServicios(servicioSeleccionado));//Realizamos el insert de los servicios en la tabla detallecobroos
+                        db.SpModificarCobro(cobro.idcobro, MontoServicios(servicioSeleccionado, cobro));//Modificamos unicamente el monto de los servicios
+                        InsertarServiciosCobro(servicioSeleccionado, cobro, MontoServicios(servicioSeleccionado, cobro));//Realizamos el insert de los servicios en la tabla detallecobroos
+                        ViewBag.Estadocasa = estadoCasa = null;//Actualizamos para que la alerta en la vista no salte
                         ViewBag.resultado = "Se ha logrado modificar con exito";
                     }
                 }
@@ -122,14 +124,14 @@ namespace PVI_Final_Condominios.Controllers
                 return Json(list);
         }
 
-        public JsonResult DdlCasas(int? id)
+        public JsonResult DdlCasas(int? Id)
         {//Ddl que usamos para traer las casas activas de un cliente especifico
             var list = new List<DropDownList>();//Variable que va a guardar la estructura del modelo DDL
             try
             {
                 using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
                 {//Almacenamos en list los id y nombres de las casas para el ddl de la vista
-                    list = db.SpConsultarCasaddl(id).Select(_ => new DropDownList { Id = _.Id_casa, Nombre = _.Nombre_casa }).ToList();
+                    list = db.SpConsultarCasaddl(Id).Select(_ => new DropDownList { Id = _.Id_casa, Nombre = _.Nombre_casa }).ToList();
                 }
             }
             catch
@@ -139,22 +141,24 @@ namespace PVI_Final_Condominios.Controllers
             return Json(list);
         }
 
-        public decimal MontoServicios(List<int> servicioSeleccionado)
+        public decimal MontoServicios(List<int> servicioSeleccionado, CobrosModels cobro)
         {
             decimal monto = 0;
+            decimal serviciomonto = 0;
             try
             {
 
                 if (servicioSeleccionado != null && servicioSeleccionado.Any())
                 {
-                    foreach (var servicioId in servicioSeleccionado)
+                    using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD, por fuera del ciclo para evitar la repeticion de una conexion a la BD
                     {
-                        using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
+                        var datoscasa = db.SpConsultarCasaddl(cobro.idcasa).FirstOrDefault();
+                        foreach (var servicioId in servicioSeleccionado)
                         {
                             var valor = db.SpConsultarPrecioServicioporId(servicioId).FirstOrDefault();
-
-                            monto += valor.Precio;
+                            serviciomonto += valor.Precio;
                         }
+                        monto = (datoscasa.Precio / datoscasa.Metros_cuadrados) + serviciomonto;
                     }
                 }
 
@@ -196,13 +200,14 @@ namespace PVI_Final_Condominios.Controllers
             using (var db = new PviProyectoFinalDB("MyDatabase"))
             {
                 //Creamos un Enumerable y le generamos una secuencia con un rango de numeros enteros, empieza en 2024 contandolo y genera 11 numeros.
-                ViewBag.Anno = Enumerable.Range(DateTime.Now.Year, 11).Select(a => new SelectListItem//Toma cada numero y lo vuelve un elemento individual de la lista 
+               var annos = Enumerable.Range(DateTime.Now.Year, 11).Select(a => new SelectListItem()//Toma cada numero y lo vuelve un elemento individual de la lista 
                 {
                     Value = a.ToString(),//Convertimos el año "a" en string ya que el ddl solo admite string y lo asignamos como el valor
                     Text = a.ToString(),//Convierte el numero a una cadena para mostrarlo al usuario tambien
-                    Selected = (cobro != null && a == cobro.anno)
+                    Selected = (cobro != null && a == cobro.anno),
                     //Solo en caso de que el año se encuentre en la lista creada y coincida con el año que viene de la bd se seleccionara
                 }).OrderBy(a => a.Text).ToList();//Ordenamos de forma ascendente y lo volvemos una lista
+                ViewBag.annos = annos;
 
 
                 //Creacion de la lista de meses

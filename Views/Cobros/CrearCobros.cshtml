@@ -27,10 +27,7 @@
 
     <div class="md-3">
         <label class="form-label" for="anno">Año</label>
-             @Html.DropDownList("annos", (IEnumerable<SelectListItem>)ViewBag.Anno, "Seleccione un año", new { @class = "form-control" })
-
-        @*@Html.DropDownListFor(model => model.anno, (IEnumerable<SelectListItem>)ViewBag.Anno, "Seleccione un año", new { @class = "form-control" })*@
-        @*Solo ha funcionado la carga del año mediante @Html.DropDownList y no con @Html.DropDownListFor *@
+        @Html.DropDownListFor(model => model.anno,(IEnumerable<SelectListItem>)ViewBag.annos,"Seleccione un año",new { @class = "form-control" })
     </div>
 
     <div class="md-3">
@@ -149,12 +146,12 @@
         };
 
         $(document).ready(function () {
-            var idcobro = @((this.Model != null) ? this.Model.idcobro : 0);
+            var idcliente = @((this.Model != null) ? this.Model.idCliente : 0);
             var idcasa =@((this.Model !=null) ? this.Model.idcasa :0 );
 
-            loadDropdown("/Cobros/DdlClientes", {}, $("#idCliente"), idcobro);
+            loadDropdown("/Cobros/DdlClientes", {}, $("#idCliente"), idcliente);
             if (idcasa != 0) {
-                loadDropdown("/Cobros/DdlCasas", { Id: idcobro }, $("#idCasa"), idcasa);
+                loadDropdown("/Cobros/DdlCasas", { Id: idcliente }, $("#idCasa"), idcasa);
             }
 
         setChanges();
