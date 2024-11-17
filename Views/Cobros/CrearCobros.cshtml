@@ -3,6 +3,10 @@
     ViewBag.Title = "CrearCobros";
 }
 
+<!--Colocamos un Script para mandar una alerta de confirmación en caso de querer cancelar una reservación-->
+
+
+
 <h2>Crear Cobros</h2>
 
 <form method="post" id="myform">
@@ -22,31 +26,49 @@
     </div>
 
     <div class="md-3">
-        <label for="anioSeleccionado">Año</label>
-        @Html.DropDownList("annoSeleccionado", (IEnumerable<SelectListItem>)ViewBag.Anno, "Seleccione un año", new { @class = "form-control" })
-        @*Solo ha funcionado la carga del año mediante la lista creada en controller con DDList*@
+        <label class="form-label" for="anno">Año</label>
+        @Html.DropDownListFor(model => model.anno,(IEnumerable<SelectListItem>)ViewBag.annos,"Seleccione un año",new { @class = "form-control" })
     </div>
 
     <div class="md-3">
         <label class="form-label" for="mes">Mes</label>
-        @Html.DropDownListFor(model => model.mes, (IEnumerable<SelectListItem>)ViewBag.meses,"Seleccione un mes", new { @class = "form-control" })
+        @Html.DropDownListFor(model => model.mes, (IEnumerable<SelectListItem>)ViewBag.meses, "Seleccione un mes", new { @class = "form-control" })
     </div>
 
     <div class="mt-2 mb-3">
         @foreach (var servicio in ViewBag.servicios)
         {
             <div class="mt-1">
-                <input type="checkbox" name="serviciosSeleccionado"/>
-                <label>@servicio.Column4: @servicio.Nombre</label>
+                @*El atributo "name" es el que pasamos abajo en el js para definir que es requerido para poder guardar*@
+                <input type="checkbox" id="servicioSeleccionado_@servicio.Id_servicio" name="servicioSeleccionado[]" value="@servicio.Id_servicio" 
+                       @if(ViewBag.serviciosSeleccionados != null)
+                {//Codigo que nos permite tomar la lista almacenada en el viewbag para seleccionar los checkbox
+                    @((ViewBag.serviciosSeleccionados).Contains(servicio.Id_servicio) ? "checked" : "")//verificamos un valor específico dentro de la lista con Contains() en este caso es Id_servicio
+                }
+                       />
+                <label class="form-label" for="servicioSeleccionado_@servicio.Id_servicio">@servicio.Column4 : @servicio.Nombre</label>
             </div>
         }
-        </div>
+    </div>
 
-            <input type="submit" class="btn btn-primary" value="Guardar" />
-
+    <input type="submit" onclick="guardarServicios();" class="btn btn-primary" value="Guardar" />
+    <a href="/Cobros/ConsultarCobros" class="btn btn-secondary">Regresar</a>
+    @ViewBag.resultado
 </form>
 
+
+@if (ViewBag.Estadocasa != null)//Nota: Se recarga la pagina al coincidir y se borran los datos selecionados
+{
+    <!--Colocamos un Script para mandar una alerta de confirmación en caso de querer cancelar una reservación-->
+    <script type="text/javascript">
+        alert('No se ha logrado realizar el cobro debido a que existe un cobro pendiente en la casa elegida');
+    </script>
+}
+
+
 @ViewBag.resultado
+
+
 
 @section Scripts{
     @Scripts.Render("~/bundles/jqueryval")
@@ -60,7 +82,7 @@
                 'idCasa': {
                     required: true,
                 },
-                'annoSeleccionado': {
+                'annos': {
                     required: true
                 },
                 'costo': {
@@ -69,16 +91,33 @@
                 'mes': {
                     required: true
                 },
-                'serviciosSeleccionado': {
+                'servicioSeleccionado[]': {
                     required: true
                 }
             }
         });
 
-        function cleanDropdown(ddl) {
-            ddl.empty();
-            ddl.append("<option value=''>Seleccione una opcion</option>");
-        };
+
+        function guardarServicios() {
+            //Obtenemos todos los checkboxes seleccionados
+            var checkboxes = document.querySelectorAll("input[name='servicioSeleccionado[]']:checked");
+
+            //Creamos un arreglo para almacenar los valores de los checkboxes que seleccionamos
+            var serviciosSeleccionados = [];
+            checkboxes.forEach((checkbox) => {
+                serviciosSeleccionados.push(parseInt(checkbox.value, 10)); // Convertimos a entero
+            });
+
+            //Enviamos el array al controlador usando AJAX
+            fetch('/Cobros/GuardarServicios', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ servicioSeleccionado: serviciosSeleccionados })
+            })
+        }
+
 
         function loadDropdown(url, parametros, ddl, selected) {//Parametros que va a recibir nuestra funcion
             $.post(url, parametros, function (data) {//Elegimos el metodo por el que sera enviado
@@ -99,17 +138,20 @@
                 loadDropdown("/Cobros/DdlCasas", { Id: $("#idCliente").val() }, $("#idCasa"));
                 cleanDropdown($("#idCasa"));
             });
+        };
 
-
+        function cleanDropdown(ddl) {
+            ddl.empty();
+            ddl.append("<option value=''>Seleccione una opcion</option>");
         };
 
         $(document).ready(function () {
-            var idcobro = @((this.Model != null) ? this.Model.idcobro : 0);
+            var idcliente = @((this.Model != null) ? this.Model.idCliente : 0);
             var idcasa =@((this.Model !=null) ? this.Model.idcasa :0 );
 
-            loadDropdown("/Cobros/DdlClientes", {}, $("#idCliente"), idcobro);
+            loadDropdown("/Cobros/DdlClientes", {}, $("#idCliente"), idcliente);
             if (idcasa != 0) {
-                loadDropdown("/Cobros/DdlCasas", { Id: idcobro }, $("#idCasa"), idcasa);
+                loadDropdown("/Cobros/DdlCasas", { Id: idcliente }, $("#idCasa"), idcasa);
             }
 
         setChanges();
@@ -117,4 +159,5 @@
 
 
 
-    </script>}
+    </script>
+}

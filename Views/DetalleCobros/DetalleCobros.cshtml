@@ -3,17 +3,62 @@
 @{
     ViewBag.Title = "DetalleCobros";
 }
+<html>
+<head>
+    <style>
+        .detalle-cobro {
+            width: 50%;
+            border-collapse: collapse;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+        }
 
-<h2>Detalle del Cobro</h2>
+            .detalle-cobro th, .detalle-cobro td {
+                border: 1px solid #ddd;
+                padding: 10px;
+                text-align: left;
+            }
 
-<div>
-    <p><strong>Número de Cobro:</strong>@PVI_Final_Condominios.Models.DetalleCobrosModels   </p>
-    <p><strong>Casa:</strong> @Model.Casa.nombre_casa</p>
-    <p><strong>Fecha de Emisión:</strong> @Model.FechaEmision.ToShortDateString()</p>
-    <p><strong>Fecha de Vencimiento:</strong> @Model.FechaVencimiento.ToShortDateString()</p>
-    <p><strong>Monto:</strong> @Model.Monto</p>
-    <p><strong>Estado:</strong> @Model.Estado</p>
+            .detalle-cobro th {
+                background-color: #f2f2f2;
+                font-weight: bold;
+            }
+    </style>
+</head>
+<body>
 
-    @* *@
-</div>
+    <h2>Detalle del cobro</h2>
+
+    <table class="detalle-cobro">
+        <tr>
+            <th># Cobro</th>
+            <td>A15</td>
+        </tr>
+        <tr>
+            <th>Propietario</th>
+            <td>Jorge Trejos</td>
+        </tr>
+        <tr>
+            <th>Nombre Casa</th>
+            <td>A15</td>
+        </tr>
+        <tr>
+            <th>Monto Cobro</th>
+            <td>₡27 966.67</td>
+        </tr>
+        <tr>
+            <th>Precio Casa</th>
+            <td>₡33 560 000.00</td>
+        </tr>
+        <tr>
+            <th>Periodo</th>
+            <td>Marzo - 2024</td>
+        </tr>
+        <tr>
+            <th>Estado</th>
+            <td>Pendiente</td>
+        </tr>
+    </table>
+
+</body>
+</html>
 

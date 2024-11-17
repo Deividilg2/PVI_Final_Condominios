@@ -281,9 +281,11 @@ namespace DataModels
 
 		public partial class SpConsultarCasaddlResult
 		{
-			[Column("id_casa")    ] public int    Id_casa     { get; set; }
-			[Column("nombre_casa")] public string Nombre_casa { get; set; }
-			[Column("estado")     ] public bool?  Estado      { get; set; }
+			[Column("id_casa")         ] public int     Id_casa          { get; set; }
+			[Column("nombre_casa")     ] public string  Nombre_casa      { get; set; }
+			[Column("estado")          ] public bool?   Estado           { get; set; }
+			[Column("precio")          ] public decimal Precio           { get; set; }
+			[Column("metros_cuadrados")] public int     Metros_cuadrados { get; set; }
 		}
 
 		#endregion
@@ -445,6 +447,25 @@ namespace DataModels
 
 		#endregion
 
+		#region SpConsultarPrecioServicioporId
+
+		public static IEnumerable<SpConsultarPrecioServicioporIdResult> SpConsultarPrecioServicioporId(this PviProyectoFinalDB dataConnection, int? @IdServicio)
+		{
+			var parameters = new []
+			{
+				new DataParameter("@IdServicio", @IdServicio, LinqToDB.DataType.Int32)
+			};
+
+			return dataConnection.QueryProc<SpConsultarPrecioServicioporIdResult>("[dbo].[sp_ConsultarPrecioServicioporId]", parameters);
+		}
+
+		public partial class SpConsultarPrecioServicioporIdResult
+		{
+			[Column("precio")] public decimal Precio { get; set; }
+		}
+
+		#endregion
+
 		#region SpConsultarServicios
 
 		public static IEnumerable<SpConsultarServiciosResult> SpConsultarServicios(this PviProyectoFinalDB dataConnection)
@@ -546,21 +567,36 @@ namespace DataModels
 
 		#region SpInsertarCobro
 
-		public static int SpInsertarCobro(this PviProyectoFinalDB dataConnection, int? @idCasa, int? @mes, int? @anno, string @estado, decimal? @monto)
+		public static int SpInsertarCobro(this PviProyectoFinalDB dataConnection, int? @idCasa, int? @mes, int? @anno, decimal? @monto)
 		{
 			var parameters = new []
 			{
 				new DataParameter("@id_casa", @idCasa, LinqToDB.DataType.Int32),
 				new DataParameter("@mes",     @mes,    LinqToDB.DataType.Int32),
 				new DataParameter("@anno",    @anno,   LinqToDB.DataType.Int32),
-				new DataParameter("@estado",  @estado, LinqToDB.DataType.VarChar)
-				{
-					Size = 50
-				},
 				new DataParameter("@monto",   @monto,  LinqToDB.DataType.Decimal)
 			};
 
 			return dataConnection.ExecuteProc("[dbo].[sp_InsertarCobro]", parameters);
+		}
+
+		#endregion
+
+		#region SpInsertarDetalleCobro
+
+		public static int SpInsertarDetalleCobro(this PviProyectoFinalDB dataConnection, int? @IdServicio, int? @IdCobro, int? @IdCasa, int? @mes, int? @anno, decimal? @monto)
+		{
+			var parameters = new []
+			{
+				new DataParameter("@IdServicio", @IdServicio, LinqToDB.DataType.Int32),
+				new DataParameter("@IdCobro",    @IdCobro,    LinqToDB.DataType.Int32),
+				new DataParameter("@IdCasa",     @IdCasa,     LinqToDB.DataType.Int32),
+				new DataParameter("@mes",        @mes,        LinqToDB.DataType.Int32),
+				new DataParameter("@anno",       @anno,       LinqToDB.DataType.Int32),
+				new DataParameter("@monto",      @monto,      LinqToDB.DataType.Decimal)
+			};
+
+			return dataConnection.ExecuteProc("[dbo].[sp_InsertarDetalleCobro]", parameters);
 		}
 
 		#endregion
@@ -592,18 +628,11 @@ namespace DataModels
 
 		#region SpModificarCobro
 
-		public static int SpModificarCobro(this PviProyectoFinalDB dataConnection, int? @idCobro, int? @idCasa, int? @mes, int? @anno, string @estado, decimal? @monto)
+		public static int SpModificarCobro(this PviProyectoFinalDB dataConnection, int? @idCobro, decimal? @monto)
 		{
 			var parameters = new []
 			{
 				new DataParameter("@id_cobro", @idCobro, LinqToDB.DataType.Int32),
-				new DataParameter("@id_casa",  @idCasa,  LinqToDB.DataType.Int32),
-				new DataParameter("@mes",      @mes,     LinqToDB.DataType.Int32),
-				new DataParameter("@anno",     @anno,    LinqToDB.DataType.Int32),
-				new DataParameter("@estado",   @estado,  LinqToDB.DataType.VarChar)
-				{
-					Size = 50
-				},
 				new DataParameter("@monto",    @monto,   LinqToDB.DataType.Decimal)
 			};
 

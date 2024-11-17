@@ -14,6 +14,7 @@
         <th># Propietario</th>
         <th>Periodo</th>
         <th>Estado</th>
+        <th> </th>
     </tr>
 
     @foreach (var cobros in Model)
@@ -24,6 +25,7 @@
             <td>@cobros.Nombre</td>
             <td>@cobros.Mes</td>
             <td>@cobros.Estado</td>
+            <td>@Html.ActionLink("Consultar", "ConsultarDetalleCobros", "Cobros")</td>
         </tr>
     }
 
