@@ -19,12 +19,22 @@ namespace PVI_Final_Condominios.Controllers
         public ActionResult ConsultarCobros()
         {
             //Creamos una variable para almacenar los atributos del modelo
-            var cobrosList = new List<CobrosModels>();
             var list = new List<SpConsultarCobrosResult>();//Variable para almacenar los datos del SP de los empleados
             try
             {
                 using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
                 {
+                    //Validamos la sesion del usuario activa
+                    if (Session["Usuario"] == null)
+                    {
+                        Response.Redirect("~/Pages/Login.aspx");
+                    }
+                    //Creamos una instancia de Usuario para tomar los datos  del usuario
+                    LoginModels usuario = (LoginModels)Session["Usuario"];
+                    if (usuario.esEmpleado == "Cliente")//Validamos que el usuario sea un empleado para poder entrar
+                    {
+                        Response.Redirect("~/Cobros/CrearCobros", false);
+                    }
 
                     list = db.SpConsultarCobros().ToList();//Almacenamos el resultado, del SP
 
@@ -42,6 +52,16 @@ namespace PVI_Final_Condominios.Controllers
         public ActionResult CrearCobros(int? id)
         {//Creacion de una variable cobro con el modelo
             var cobro = new CobrosModels();
+            if (Session["Usuario"] == null)
+            {
+                Response.Redirect("~/Pages/Login.aspx");
+            }
+            //Creamos una instancia de Usuario para tomar los datos  del usuario
+            LoginModels usuario = (LoginModels)Session["Usuario"];
+            if (usuario.esEmpleado == "Cliente")//Validamos que el usuario sea un empleado para poder entrar
+            {
+                Response.Redirect("~/Cobros/CrearCobros", false);
+            }
             try
             {//Conexion a la base de datps
                 using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
@@ -61,6 +81,7 @@ namespace PVI_Final_Condominios.Controllers
             }
             catch
             {
+
             }
             return View(cobro);
         }
@@ -175,16 +196,21 @@ namespace PVI_Final_Condominios.Controllers
             {
                 using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
                 {
-                    foreach (var servicioId in servicioSeleccionado)
+
+                    if (cobro != null)//Si contiene el id de un servicio que no lo tome encuenta
                     {
-                        ViewBag.serviciosSeleccionados = cobro != null ? //Tomamos los sercicios que ya estan seleccionados
-                    db.SpConsultarServiciosporCobro(cobro.idcobro).Select(s => s.Id_servicio).ToList() : null;
-                        var serviciosExistentes = ViewBag.serviciosSeleccionados;
-                        if (!serviciosExistentes.Contains(servicioId))
+                        var serviciosexistentes = db.SpConsultarServiciosporCobro(cobro.idcobro).Select(s => s.Id_servicio).ToList();
+                        var serviciosInsertar = servicioSeleccionado.Except(serviciosexistentes).ToList();
+                        //Comparamos las listas con Except, la lista servicioSeleccionado elimina los que si encuentra en la lista serviciosexistentes
+                        var servicioaEliminar = serviciosexistentes.Except(servicioSeleccionado).ToList();//Tomamos los servicios que ya no estan seleccionados
+                        foreach (var servicioId in serviciosInsertar)
                         {
                             db.SpInsertarDetalleCobro(servicioId, cobro.idcobro, cobro.idcasa, cobro.mes, cobro.anno, monto);
                         }
-
+                        foreach (var servicioId in servicioaEliminar)
+                        {
+                            db.SpEliminarServiciodeCobro(servicioId);
+                        }
                     }
                 }
             }

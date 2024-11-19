@@ -10,7 +10,6 @@
 <h2>Crear Cobros</h2>
 
 <form method="post" id="myform">
-    @Html.HiddenFor(model => model.idcobro)
     <div class="md-3">
         <label class="form-label" for="idCliente">Cliente</label>
         <select id="idCliente" name="idCliente" class="form-control">
@@ -53,7 +52,6 @@
 
     <input type="submit" onclick="guardarServicios();" class="btn btn-primary" value="Guardar" />
     <a href="/Cobros/ConsultarCobros" class="btn btn-secondary">Regresar</a>
-    @ViewBag.resultado
 </form>
 
 

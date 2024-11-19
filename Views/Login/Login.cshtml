@@ -1,0 +1,98 @@
+﻿@model PVI_Final_Condominios.Models.LoginModels
+@{
+    ViewBag.Title = "Login";
+}
+
+<style>
+
+    #ContenedorPadre {
+        font-family: Arial, sans-serif;
+        height: 70vh;
+        text-align: center;
+        margin: 0;
+        background-color: white;
+        padding-top: 10%;
+    }
+
+    #Contenedor {
+        text-align: center;
+        width: 25%;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    h2 {
+        display: flex;
+        justify-content: center;
+        font-size: 2rem;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #lbl {
+        font-size: 1rem;
+        margin-bottom: 1px;
+        color: #555;
+    }
+
+    .txtdatos {
+        width: 100%;
+        max-width: 300px;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 2px solid #0ea77f;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+
+    #BtnLogin {
+        width: 100%;
+        max-width: 300px;
+        padding: 10px;
+        font-size: 1rem;
+        color: #fff;
+        background-color: #0ea77f;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        #BtnLogin:hover {
+            background-color: #088a63;
+        }
+</style>
+
+<form method="post">
+    <div id="ContenedorPadre">
+        <h2>Login</h2>
+        <div id="Contenedor">
+            <h2>Bienvenido</h2>
+            
+                <label class="lbl" for="email">Dirección de correo electrónico</label>
+                @Html.TextBoxFor(model => model.email, new { @class = "form-control" })
+
+                <label class="lbl" for="password">Contraseña</label>
+                @Html.PasswordFor(model => model.password, new { @class = "form-control" })
+                <input type="submit" class="btn btn-primary" value="Continuar" />
+        </div>
+
+    </div>
+</form>
+
+
+
+
+
+

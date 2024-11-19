@@ -23,7 +23,7 @@ namespace DataModels
 	/// <summary>
 	/// Database       : PVI_ProyectoFinal
 	/// Data Source    : DEIVIDILG\DEIVIDILG
-	/// Server Version : 14.00.2065
+	/// Server Version : 14.00.2070
 	/// </summary>
 	public partial class PviProyectoFinalDB : LinqToDB.Data.DataConnection
 	{
@@ -589,6 +589,20 @@ namespace DataModels
 
 		#endregion
 
+		#region SpEliminarServiciodeCobro
+
+		public static int SpEliminarServiciodeCobro(this PviProyectoFinalDB dataConnection, int? @IdServicio)
+		{
+			var parameters = new []
+			{
+				new DataParameter("@IdServicio", @IdServicio, LinqToDB.DataType.Int32)
+			};
+
+			return dataConnection.ExecuteProc("[dbo].[spEliminarServiciodeCobro]", parameters);
+		}
+
+		#endregion
+
 		#region SpHelpdiagramdefinition
 
 		public static IEnumerable<SpHelpdiagramdefinitionResult> SpHelpdiagramdefinition(this PviProyectoFinalDB dataConnection, string @diagramname, int? @ownerId)
@@ -696,6 +710,27 @@ namespace DataModels
 			};
 
 			return dataConnection.ExecuteProc("[dbo].[sp_InsertarDetalleCobro]", parameters);
+		}
+
+		#endregion
+
+		#region SpLogin
+
+		public static IEnumerable<Persona> SpLogin(this PviProyectoFinalDB dataConnection, string @Email, string @Clave)
+		{
+			var parameters = new []
+			{
+				new DataParameter("@Email", @Email, LinqToDB.DataType.VarChar)
+				{
+					Size = 150
+				},
+				new DataParameter("@Clave", @Clave, LinqToDB.DataType.VarChar)
+				{
+					Size = 15
+				}
+			};
+
+			return dataConnection.QueryProc<Persona>("[dbo].[spLogin]", parameters);
 		}
 
 		#endregion
