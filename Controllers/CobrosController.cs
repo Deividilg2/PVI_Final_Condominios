@@ -114,7 +114,7 @@ namespace PVI_Final_Condominios.Controllers
                 using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
                 {
 
-                    list = db.SpConsultarDetalleCobros();//Almacenamos el resultado, del SP
+                   // list = db.SpConsultarCobros().ToList;//Almacenamos el resultado, del S
 
                 }
             }
@@ -123,7 +123,7 @@ namespace PVI_Final_Condominios.Controllers
 
             }
 
-            return View();//Pasamos la lista del modelo
+            return View(list);//Pasamos la lista del modelo
         }
 
 

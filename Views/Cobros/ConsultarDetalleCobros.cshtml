@@ -1,7 +1,7 @@
 ﻿@model List<DataModels.PviProyectoFinalDBStoredProcedures.SpConsultarDetalleCobroResult>
 
 @{
-    ViewBag.Title = "";
+    ViewBag.Title = "ConsultarDetalleCobros";
 }
 
 <html>
@@ -39,7 +39,7 @@
             <th>Estado</th>
         </tr>
         @{
-            foreach (var cobros in ViewBag)
+            foreach (var cobros in Model)
             {
                 <tr>
                     <td>@cobros.Id_cobro </td>
