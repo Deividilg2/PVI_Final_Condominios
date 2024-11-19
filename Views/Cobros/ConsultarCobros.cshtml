@@ -25,26 +25,27 @@
             <td>@cobros.Nombre</td>
             <td>@cobros.Mes</td>
             <td>@cobros.Estado</td>
-            <td>@Html.ActionLink("Consultar", "ConsultarDetalleCobros", "Cobros")  </td>
+            <td><button id="abrirDetalleCobro" class="btn btn-primary">Consultar</button></td>
         </tr>
     }
 
 
 </table>
 
-<div id="dialog" title="Basic dialog">
-    <p>This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.</p>
-</div>
-
-<div id="dialog" title="Basic dialog">
-    <p>This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.</p>
-</div>
-
 
 @section Scripts{
     <script>
         $(function () {
-            $("#dialog").dialog();
+            $("#dialog").dialog({
+                autoOpen: false,
+                resizable: false,
+                modal:true,
+                title: "Detalle cobro"
+            });
+
+            $("#abrirDetalleCobro").on("click", function () {
+                $("#dialog").dialog("open");
+            })
         });
     </script>
 

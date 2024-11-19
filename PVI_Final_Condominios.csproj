@@ -346,6 +346,7 @@
     <Content Include="Views\Cobros\CrearCobros.cshtml" />
     <Content Include="Views\Cobros\ConsultarCobros.cshtml" />
     <Content Include="Views\Cobros\ConsultarDetalleCobros.cshtml" />
+    <Content Include="Views\Cobros\DetalleCobro.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
