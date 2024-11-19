@@ -68,13 +68,6 @@ namespace PVI_Final_Condominios.Controllers
 
         //Creamos el metodo para redireccionar a la vista DetalleCobro
 
-        public ActionResult ConsultarDetalleCobros() 
-        { 
-            return View();
-        }
-
-         
-
         [HttpPost]
         public ActionResult CrearCobros(CobrosModels cobro, List<int> servicioSeleccionado)
         {
@@ -112,8 +105,29 @@ namespace PVI_Final_Condominios.Controllers
             return View();
         }
 
-        
-        
+        public ActionResult ConsultarDetalleCobros()
+        {
+            var cobrosList = new List<CobrosModels>();
+            var list = new List<SpConsultarCobrosResult>();//Variable para almacenar los datos del SP de los empleados
+            try
+            {
+                using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
+                {
+
+                    list = db.SpConsultarDetalleCobros();//Almacenamos el resultado, del SP
+
+                }
+            }
+            catch
+            {
+
+            }
+
+            return View();//Pasamos la lista del modelo
+        }
+
+
+
 
         public JsonResult DdlClientes()
         {//Ddl que usamos para cargar a los clientes activos

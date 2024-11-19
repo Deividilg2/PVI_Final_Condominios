@@ -1,8 +1,9 @@
 ﻿@model List<DataModels.PviProyectoFinalDBStoredProcedures.SpConsultarDetalleCobroResult>
 
 @{
-    ViewBag.Title = "DetalleCobros";
+    ViewBag.Title = "";
 }
+
 <html>
 <head>
     <style>
@@ -25,40 +26,38 @@
     </style>
 </head>
 <body>
-
     <h2>Detalle del cobro</h2>
 
-    <table class="detalle-cobro">
+    <table class="detalle-cobro table-hover">
         <tr>
             <th># Cobro</th>
-            <td>A15</td>
-        </tr>
-        <tr>
             <th>Propietario</th>
-            <td>Jorge Trejos</td>
-        </tr>
-        <tr>
             <th>Nombre Casa</th>
-            <td>A15</td>
-        </tr>
-        <tr>
             <th>Monto Cobro</th>
-            <td>₡27 966.67</td>
-        </tr>
-        <tr>
             <th>Precio Casa</th>
-            <td>₡33 560 000.00</td>
-        </tr>
-        <tr>
             <th>Periodo</th>
-            <td>Marzo - 2024</td>
-        </tr>
-        <tr>
             <th>Estado</th>
-            <td>Pendiente</td>
         </tr>
-    </table>
+        @{
+            foreach (var cobros in ViewBag)
+            {
+                <tr>
+                    <td>@cobros.Id_cobro </td>
+                    <td>@cobros.Nombre</td>
+                    <td>@cobros.Nombre_casa</td>
+                    <td>@cobros.Monto</td>
+                    <td>@cobros.Precio</td>
+                    <td>@cobros.Mes</td>
+                    <td>@cobros.Anno</td>
+                    <td>@cobros.Estado</td>
+                </tr>
+            }
 
+        }
+    </table>
+    <input type="button" class="btn btn-primary" value="Editar" />
+    <input type="button" class="btn btn-success" value="Pagar" />
+    <input type="button" class="btn btn-danger" value="Eliminar" />
+    <input type="button" class="btn btn-light" value="Guardar" />
 </body>
 </html>
-

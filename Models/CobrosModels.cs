@@ -16,9 +16,7 @@ namespace PVI_Final_Condominios.Models
 
         //Variables necesarias para RF cobro detalle
 
-        public int monto { get; set; }
-
-
+        public int id_servicio { get; set; }
 
     }
 }

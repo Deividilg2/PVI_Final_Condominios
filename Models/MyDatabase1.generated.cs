@@ -381,13 +381,15 @@ namespace DataModels
 
 		public partial class SpConsultarDetalleCobroResult
 		{
-			[Column("id_servicio")    ] public int      Id_servicio     { get; set; }
-			[Column("nombre_servicio")] public string   Nombre_servicio { get; set; }
-			[Column("precio_servicio")] public decimal  Precio_servicio { get; set; }
-			[Column("id_cobro")       ] public int      Id_cobro        { get; set; }
-			[Column("monto_cobro")    ] public decimal? Monto_cobro     { get; set; }
-			[Column("estado_cobro")   ] public string   Estado_cobro    { get; set; }
-			[Column("nombre_casa")    ] public string   Nombre_casa     { get; set; }
+			[Column("id_cobro")   ] public int      Id_cobro    { get; set; }
+			[Column("nombre")     ] public string   Nombre      { get; set; }
+			[Column("nombre_casa")] public string   Nombre_casa { get; set; }
+			[Column("monto")      ] public decimal? Monto       { get; set; }
+			[Column("precio")     ] public decimal  Precio      { get; set; }
+			[Column("mes")        ] public int      Mes         { get; set; }
+			[Column("anno")       ] public int      Anno        { get; set; }
+			[Column("estado")     ] public string   Estado      { get; set; }
+			[Column("id_servicio")] public int      Id_servicio { get; set; }
 		}
 
 		#endregion

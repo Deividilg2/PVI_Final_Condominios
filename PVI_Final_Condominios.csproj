@@ -257,13 +257,11 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\CobrosController.cs" />
-    <Compile Include="Controllers\DetalleCobrosController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CobrosModels.cs" />
-    <Compile Include="Models\DetalleCobrosModels.cs" />
     <Compile Include="Models\DropDownList.cs" />
     <Compile Include="Models\MyDatabase1.generated.cs">
       <AutoGen>True</AutoGen>
@@ -347,7 +345,8 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Cobros\CrearCobros.cshtml" />
     <Content Include="Views\Cobros\ConsultarCobros.cshtml" />
-    <Content Include="Views\DetalleCobros\DetalleCobros.cshtml" />
+    <Content Include="Views\Cobros\ConsultarDetalleCobros.cshtml" />
+    <Content Include="Views\Cobros\DetalleCobros.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
