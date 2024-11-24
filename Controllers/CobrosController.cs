@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Web;
@@ -20,24 +21,25 @@ namespace PVI_Final_Condominios.Controllers
         {
             //Creamos una variable para almacenar los atributos del modelo
             var list = new List<SpConsultarCobrosResult>();//Variable para almacenar los datos del SP de los empleados
+            var cobro = new CobrosModels();
             try
             {
                 using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
                 {
-                    //Validamos la sesion del usuario activa
-                    if (Session["Usuario"] == null)
-                    {
-                        Response.Redirect("~/Pages/Login.aspx");
-                    }
-                    //Creamos una instancia de Usuario para tomar los datos  del usuario
-                    LoginModels usuario = (LoginModels)Session["Usuario"];
-                    if (usuario.esEmpleado == "Cliente")//Validamos que el usuario sea un empleado para poder entrar
-                    {
-                        Response.Redirect("~/Cobros/CrearCobros", false);
-                    }
+                    ////Validamos la sesion del usuario activa
+                    //if (Session["Usuario"] == null)
+                    //{
+                    //    Response.Redirect("~/Pages/Login.aspx");
+                    //}
+                    ////Creamos una instancia de Usuario para tomar los datos  del usuario
+                    //LoginModels usuario = (LoginModels)Session["Usuario"];
+                    //if (usuario.esEmpleado == "Cliente")//Validamos que el usuario sea un empleado para poder entrar
+                    //{
+                    //    Response.Redirect("~/Cobros/CrearCobros", false);
+                    //}
 
                     list = db.SpConsultarCobros().ToList();//Almacenamos el resultado, del SP
-
+                    ServiciosyddlsdeFechas(cobro);
                 }
             }
             catch
@@ -52,16 +54,16 @@ namespace PVI_Final_Condominios.Controllers
         public ActionResult CrearCobros(int? id)
         {//Creacion de una variable cobro con el modelo
             var cobro = new CobrosModels();
-            if (Session["Usuario"] == null)
-            {
-                Response.Redirect("~/Pages/Login.aspx");
-            }
-            //Creamos una instancia de Usuario para tomar los datos  del usuario
-            LoginModels usuario = (LoginModels)Session["Usuario"];
-            if (usuario.esEmpleado == "Cliente")//Validamos que el usuario sea un empleado para poder entrar
-            {
-                Response.Redirect("~/Cobros/CrearCobros", false);
-            }
+            //if (Session["Usuario"] == null)
+            //{
+            //    Response.Redirect("~/Pages/Login.aspx");
+            //}
+            ////Creamos una instancia de Usuario para tomar los datos  del usuario
+            //LoginModels usuario = (LoginModels)Session["Usuario"];
+            //if (usuario.esEmpleado == "Cliente")//Validamos que el usuario sea un empleado para poder entrar
+            //{
+            //    Response.Redirect("~/Cobros/CrearCobros", false);
+            //}
             try
             {//Conexion a la base de datps
                 using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
@@ -89,7 +91,7 @@ namespace PVI_Final_Condominios.Controllers
          
 
         [HttpPost]
-        public ActionResult CrearCobros(CobrosModels cobro, List<int> servicioSeleccionado)
+        public JsonResult CrearCobros(CobrosModels cobro, List<int> servicioSeleccionado)
         {
             string resultado = String.Empty;
 
@@ -105,7 +107,7 @@ namespace PVI_Final_Condominios.Controllers
                        
                         db.SpInsertarCobro(cobro.idcasa, cobro.mes, cobro.anno, MontoServicios(servicioSeleccionado, cobro));//Tomamos el monto de una funcion
                         InsertarServiciosCobro(servicioSeleccionado, cobro, MontoServicios(servicioSeleccionado, cobro));//Realizamos el insert de los servicios en la tabla detallecobroos
-                        ViewBag.resultado = "Se ha logrado guardar con exito";
+                        resultado = "Se ha logrado guardar con exito";
 
                     }
                     else if(cobro.idcobro != 0)
@@ -121,8 +123,9 @@ namespace PVI_Final_Condominios.Controllers
             }
             catch
             {
+                resultado = "No se ha logrado guardar";
             }
-            return View();
+            return Json(resultado);
         }
 
         
@@ -158,6 +161,44 @@ namespace PVI_Final_Condominios.Controllers
             catch
             {
 
+            }
+            return Json(list);
+        }
+
+        public JsonResult DdlAnnos(int? anno)
+        {
+            var list = new List<DropDownList>();
+            try
+            {
+                // Genera la lista de años desde el actual hasta dentro de 10 años
+                list = Enumerable.Range(DateTime.Now.Year, 11)
+                    .Select(a => new DropDownList
+                    {
+                        Id = a,             // Usa el año como el ID
+                        Nombre = a.ToString() // Convierte el año en cadena para mostrarlo
+                    })
+                    .ToList();
+            }
+            catch
+            {
+            }
+            return Json(list);
+        }
+
+        public JsonResult DdlMeses(int? mes)
+        {
+            var list = new List<DropDownList>();
+            var textInfo = new System.Globalization.CultureInfo("es-ES", false).TextInfo;
+            try
+            {
+                list = Enumerable.Range(1, 12).Select(m => new DropDownList
+                {
+                    Id = m, // El valor del mes (numérico)
+                    Nombre = textInfo.ToTitleCase(new DateTime(1, m, 1).ToString("MMMM")) // Primera letra del mes en mayuscula, obteniendo la cultura es-ES 
+                }).ToList();
+            }
+            catch
+            {
             }
             return Json(list);
         }

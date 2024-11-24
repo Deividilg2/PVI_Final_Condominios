@@ -3,9 +3,6 @@
     ViewBag.Title = "CrearCobros";
 }
 
-<!--Colocamos un Script para mandar una alerta de confirmación en caso de querer cancelar una reservación-->
-
-
 
 <h2>Crear Cobros</h2>
 
@@ -39,7 +36,7 @@
         {
             <div class="mt-1">
                 @*El atributo "name" es el que pasamos abajo en el js para definir que es requerido para poder guardar*@
-                <input type="checkbox" id="servicioSeleccionado_@servicio.Id_servicio" name="servicioSeleccionado[]" value="@servicio.Id_servicio" 
+                <input type="checkbox" id="servicioSeleccionado_@servicio.Id_servicio" name="servicio" value="@servicio.Id_servicio" 
                        @if(ViewBag.serviciosSeleccionados != null)
                 {//Codigo que nos permite tomar la lista almacenada en el viewbag para seleccionar los checkbox
                     @((ViewBag.serviciosSeleccionados).Contains(servicio.Id_servicio) ? "checked" : "")//verificamos un valor específico dentro de la lista con Contains() en este caso es Id_servicio
@@ -50,17 +47,16 @@
         }
     </div>
 
-    <input type="submit" onclick="guardarServicios();" class="btn btn-primary" value="Guardar" />
+    <input type="submit" id="Guardado" onclick="guardarServicios();" class="btn btn-primary" value="Guardar" />
     <a href="/Cobros/ConsultarCobros" class="btn btn-secondary">Regresar</a>
 </form>
 
 
 @if (ViewBag.Estadocasa != null)//Nota: Se recarga la pagina al coincidir y se borran los datos selecionados
 {
-    <!--Colocamos un Script para mandar una alerta de confirmación en caso de querer cancelar una reservación-->
-    <script type="text/javascript">
-        alert('No se ha logrado realizar el cobro debido a que existe un cobro pendiente en la casa elegida');
-    </script>
+    <div id="modalAlert" title="Alerta">
+        <p>No se ha logrado realizar el cobro debido a que existe un cobro pendiente en la casa elegida</p>
+    </div>
 }
 
 
@@ -80,7 +76,7 @@
                 'idCasa': {
                     required: true,
                 },
-                'annos': {
+                'anno': {
                     required: true
                 },
                 'costo': {
@@ -89,16 +85,16 @@
                 'mes': {
                     required: true
                 },
-                'servicioSeleccionado[]': {
+                'servicio': {
                     required: true
-                }
-            }
+                },
+            },
         });
 
 
         function guardarServicios() {
             //Obtenemos todos los checkboxes seleccionados
-            var checkboxes = document.querySelectorAll("input[name='servicioSeleccionado[]']:checked");
+            var checkboxes = document.querySelectorAll("input[name='servicio']:checked");
 
             //Creamos un arreglo para almacenar los valores de los checkboxes que seleccionamos
             var serviciosSeleccionados = [];
@@ -106,14 +102,11 @@
                 serviciosSeleccionados.push(parseInt(checkbox.value, 10)); // Convertimos a entero
             });
 
-            //Enviamos el array al controlador usando AJAX
-            fetch('/Cobros/GuardarServicios', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ servicioSeleccionado: serviciosSeleccionados })
-            })
+
+            console.log(serviciosSeleccionados, cobro);
+            $.post('/Cobros/CrearCobros', {servicioSeleccionado: serviciosSeleccionados, model
+            });
+
         }
 
 
@@ -152,10 +145,22 @@
                 loadDropdown("/Cobros/DdlCasas", { Id: idcliente }, $("#idCasa"), idcasa);
             }
 
-        setChanges();
+            setChanges();
+
+            //Alerta que salta cuando la casa ya tiene un cobro pendiente
+            $("#modalAlert").dialog({
+                dialogClass: "alert",
+                autoOpen: true,
+                buttons: [
+                    {
+                        text: "OK",
+                        click: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                ]
+            });
         });
-
-
 
     </script>
 }

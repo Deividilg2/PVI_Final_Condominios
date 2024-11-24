@@ -5,20 +5,15 @@
 
 <style>
 
-    #ContenedorPadre {
-        font-family: Arial, sans-serif;
-        height: 70vh;
-        text-align: center;
-        margin: 0;
-        background-color: white;
-        padding-top: 10%;
-    }
 
     #Contenedor {
-        text-align: center;
-        width: 25%;
-        padding: 30px;
+        display: grid;
+        justify-content: center; /* Centrar horizontalmente */
+        align-content: center; /* Centrar verticalmente */
+        padding: 2rem;
+        border: 1px solid #ccc;
         border-radius: 8px;
+        background-color: #fff;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         position: absolute;
         top: 50%;
@@ -47,13 +42,7 @@
     }
 
     .txtdatos {
-        width: 100%;
-        max-width: 300px;
-        padding: 10px;
-        margin-bottom: 20px;
-        border: 2px solid #0ea77f;
-        border-radius: 5px;
-        font-size: 1rem;
+     padding: 10px;
     }
 
     #BtnLogin {
@@ -69,26 +58,28 @@
         transition: background-color 0.3s ease;
     }
 
-        #BtnLogin:hover {
-            background-color: #088a63;
-        }
+    #BtnLogin:hover {
+        background-color: #088a63;
+    }
 </style>
 
 <form method="post">
-    <div id="ContenedorPadre">
-        <h2>Login</h2>
         <div id="Contenedor">
             <h2>Bienvenido</h2>
-            
-                <label class="lbl" for="email">Dirección de correo electrónico</label>
+
+            <label class="lbl" for="email">Dirección de correo electrónico</label>
+            <div class="txtdatos">
                 @Html.TextBoxFor(model => model.email, new { @class = "form-control" })
+            </div>
 
-                <label class="lbl" for="password">Contraseña</label>
+
+            <label class="lbl" for="password">Contraseña</label>
+            <div class="txtdatos">
                 @Html.PasswordFor(model => model.password, new { @class = "form-control" })
-                <input type="submit" class="btn btn-primary" value="Continuar" />
-        </div>
+            </div>
+            <input id="BtnLogin" type="submit" value="Continuar" />
 
-    </div>
+        </div>
 </form>
 
 

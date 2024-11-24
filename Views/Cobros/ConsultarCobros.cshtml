@@ -24,6 +24,7 @@
     </div>*@
 
 @Html.ActionLink("Crear cobro", "CrearCobros", null, new { @class = "btn btn-primary mb-2" })
+<button id="AbrirModal" class="btn btn-primary">Crear</button>
 <table class="table table-bordered table-hover">
     <tr>
         <th># Cobro</th>
@@ -46,3 +47,124 @@
 
 
 </table>
+
+<div id="dialog" title="CrearCobro">
+    @Html.Partial("CrearCobromodal")
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/ValidacionesGenericas 1.js"></script>
+    <script type="text/javascript">
+        $("#myform").validate({
+            rules: {
+                'idCliente': {
+                    required: true
+                },
+                'idCasa': {
+                    required: true,
+                },
+                'anno': {
+                    required: true
+                },
+                'costo': {
+                    required: true
+                },
+                'mes': {
+                    required: true
+                },
+                'servicio': {
+                    required: true
+                },
+            },
+
+            submitHandler: function (form) {
+                guardar();
+            } 
+        });
+
+        function guardar() {
+            var data = {
+                idCliente: $("#idCliente").val(),
+                idCasa: $("#idCasa").val(),
+                anno: $("#anno").val(),
+                mes: $("#mes").val(),
+            }
+
+            //Obtenemos todos los checkboxes seleccionados
+            var checkboxes = document.querySelectorAll("input[name='servicio']:checked");
+
+            //Creamos un arreglo para almacenar los valores de los checkboxes que seleccionamos
+            var serviciosSeleccionados = [];
+            checkboxes.forEach((checkbox) => {
+                serviciosSeleccionados.push(parseInt(checkbox.value, 10)); // Convertimos a entero
+            });
+
+
+            console.log(data, serviciosSeleccionados);
+            $.post('/Cobros/CrearCobros', { cobro: data, servicioSeleccionado: serviciosSeleccionados }, function (data) {
+                alert(data); location.reload();
+            });
+        }
+
+       
+        function loadDropdown(url, parametros, ddl, selected) {//Parametros que va a recibir nuestra funcion
+            $.post(url, parametros, function (data) {//Elegimos el metodo por el que sera enviado
+                ddl.empty();//Vaciamos el ddl
+                ddl.append("<option value=''>Seleccione una opcion</option");
+                $(data).each(function () {
+                    var option = new Option(this.Nombre, this.Id);
+                    if (this.Id == selected) {
+                        option.selected = true;
+                    }
+                    ddl.append(option);
+                });
+            });
+        };
+
+        function setChanges() {
+            $("#idCliente").change(function () {
+                loadDropdown("/Cobros/DdlCasas", { Id: $("#idCliente").val() }, $("#idCasa"));
+                cleanDropdown($("#idCasa"));
+            });
+        };
+
+        function cleanDropdown(ddl) {
+            ddl.empty();
+            ddl.append("<option value=''>Seleccione una opcion</option>");
+        };
+
+        $(document).ready(function () {
+            loadDropdown("/Cobros/DdlClientes", {}, $("#idCliente"));
+            loadDropdown("/Cobros/DdlAnnos", {}, $("#anno"));
+            loadDropdown("/Cobros/DdlMeses", {}, $("#mes"));
+
+
+            setChanges();
+
+            //Alerta que salta cuando la casa ya tiene un cobro pendiente
+            $("#modalAlert").dialog({
+                dialogClass: "alert",
+                autoOpen: true,
+                buttons: [
+                    {
+                        text: "OK",
+                        click: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                ]
+            });
+
+            $("#dialog").dialog({
+                modal: true,
+                autoOpen: false
+            });
+
+            $("#AbrirModal").on("click", function () {
+                $("#dialog").dialog("open");
+            });
+        });
+
+    </script>
+}
