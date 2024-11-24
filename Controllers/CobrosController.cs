@@ -115,7 +115,11 @@ namespace PVI_Final_Condominios.Controllers
                         db.SpModificarCobro(cobro.idcobro, MontoServicios(servicioSeleccionado, cobro));//Modificamos unicamente el monto de los servicios
                         InsertarServiciosCobro(servicioSeleccionado, cobro, MontoServicios(servicioSeleccionado, cobro));//Realizamos el insert de los servicios en la tabla detallecobroos
                         ViewBag.Estadocasa = estadoCasa = null;//Actualizamos para que la alerta en la vista no salte
-                        ViewBag.resultado = "Se ha logrado modificar con exito";
+                        resultado = "Se ha logrado modificar con exito";
+                    }
+                    else
+                    {
+                        resultado = "Ya se encuentra un registro en la casa seleccionada";
                     }
                 }
                 ServiciosyddlsdeFechas(cobro);//Cargamos los servicios y los ddl de anno y mes
@@ -266,34 +270,6 @@ namespace PVI_Final_Condominios.Controllers
 
             using (var db = new PviProyectoFinalDB("MyDatabase"))
             {
-                //Creamos un Enumerable y le generamos una secuencia con un rango de numeros enteros, empieza en 2024 contandolo y genera 11 numeros.
-               var annos = Enumerable.Range(DateTime.Now.Year, 11).Select(a => new SelectListItem()//Toma cada numero y lo vuelve un elemento individual de la lista 
-                {
-                    Value = a.ToString(),//Convertimos el año "a" en string ya que el ddl solo admite string y lo asignamos como el valor
-                    Text = a.ToString(),//Convierte el numero a una cadena para mostrarlo al usuario tambien
-                    Selected = (cobro != null && a == cobro.anno),
-                    //Solo en caso de que el año se encuentre en la lista creada y coincida con el año que viene de la bd se seleccionara
-                }).OrderBy(a => a.Text).ToList();//Ordenamos de forma ascendente y lo volvemos una lista
-                ViewBag.annos = annos;
-
-
-                //Creacion de la lista de meses
-                // Crear la lista de meses
-                ViewBag.meses = new List<SelectListItem>
-                    {
-                        new SelectListItem { Value = "1", Text = "Enero" },
-                        new SelectListItem { Value = "2", Text = "Febrero" },
-                        new SelectListItem { Value = "3", Text = "Marzo" },
-                        new SelectListItem { Value = "4", Text = "Abril" },
-                        new SelectListItem { Value = "5", Text = "Mayo" },
-                        new SelectListItem { Value = "6", Text = "Junio" },
-                        new SelectListItem { Value = "7", Text = "Julio" },
-                        new SelectListItem { Value = "8", Text = "Agosto" },
-                        new SelectListItem { Value = "9", Text = "Septiembre" },
-                        new SelectListItem { Value = "10", Text = "Octubre" },
-                        new SelectListItem { Value = "11", Text = "Noviembre" },
-                        new SelectListItem { Value = "12", Text = "Diciembre" }
-                    };
                 ViewBag.servicios = db.SpConsultarServicioscbx().ToList();
                 ViewBag.serviciosSeleccionados = cobro != null ? //En caso de que se este insertando un nuevo cobro no genere un error
                     db.SpConsultarServiciosporCobro(cobro.idcobro).Select(s => s.Id_servicio).ToList() : null;

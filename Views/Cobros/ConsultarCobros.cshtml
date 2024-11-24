@@ -23,8 +23,7 @@
         @Html.DropDownListFor(m => m.mes, (IEnumerable<SelectListItem>)ViewBag.meses, "Seleccione un mes", new { @class = "form-control" })
     </div>*@
 
-@Html.ActionLink("Crear cobro", "CrearCobros", null, new { @class = "btn btn-primary mb-2" })
-<button id="AbrirModal" class="btn btn-primary">Crear</button>
+<button id="AbrirModal" class="btn btn-primary mb-2">Crear cobro</button>
 <table class="table table-bordered table-hover">
     <tr>
         <th># Cobro</th>
@@ -158,7 +157,8 @@
 
             $("#dialog").dialog({
                 modal: true,
-                autoOpen: false
+                autoOpen: false,
+                width: 320
             });
 
             $("#AbrirModal").on("click", function () {
