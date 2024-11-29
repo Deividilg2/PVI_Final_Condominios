@@ -680,14 +680,18 @@ namespace DataModels
 
 		#region SpInsertarCobro
 
-		public static int SpInsertarCobro(this PviProyectoFinalDB dataConnection, int? @idCasa, int? @mes, int? @anno, decimal? @monto)
+		public static int SpInsertarCobro(this PviProyectoFinalDB dataConnection, int? @idCasa, int? @mes, int? @anno, decimal? @monto, string @serviciosSeleccionados)
 		{
 			var parameters = new []
 			{
-				new DataParameter("@id_casa", @idCasa, LinqToDB.DataType.Int32),
-				new DataParameter("@mes",     @mes,    LinqToDB.DataType.Int32),
-				new DataParameter("@anno",    @anno,   LinqToDB.DataType.Int32),
-				new DataParameter("@monto",   @monto,  LinqToDB.DataType.Decimal)
+				new DataParameter("@id_casa",                @idCasa,                 LinqToDB.DataType.Int32),
+				new DataParameter("@mes",                    @mes,                    LinqToDB.DataType.Int32),
+				new DataParameter("@anno",                   @anno,                   LinqToDB.DataType.Int32),
+				new DataParameter("@monto",                  @monto,                  LinqToDB.DataType.Decimal),
+				new DataParameter("@serviciosSeleccionados", @serviciosSeleccionados, LinqToDB.DataType.VarChar)
+				{
+					Size = -1
+				}
 			};
 
 			return dataConnection.ExecuteProc("[dbo].[sp_InsertarCobro]", parameters);
@@ -762,12 +766,18 @@ namespace DataModels
 
 		#region SpModificarCobro
 
-		public static int SpModificarCobro(this PviProyectoFinalDB dataConnection, int? @idCobro, decimal? @monto)
+		public static int SpModificarCobro(this PviProyectoFinalDB dataConnection, int? @idCobro, decimal? @monto, int? @idCliente, int? @idcasa, string @serviciosSeleccionados)
 		{
 			var parameters = new []
 			{
-				new DataParameter("@id_cobro", @idCobro, LinqToDB.DataType.Int32),
-				new DataParameter("@monto",    @monto,   LinqToDB.DataType.Decimal)
+				new DataParameter("@id_cobro",               @idCobro,                LinqToDB.DataType.Int32),
+				new DataParameter("@monto",                  @monto,                  LinqToDB.DataType.Decimal),
+				new DataParameter("@idCliente",              @idCliente,              LinqToDB.DataType.Int32),
+				new DataParameter("@idcasa",                 @idcasa,                 LinqToDB.DataType.Int32),
+				new DataParameter("@serviciosSeleccionados", @serviciosSeleccionados, LinqToDB.DataType.VarChar)
+				{
+					Size = -1
+				}
 			};
 
 			return dataConnection.ExecuteProc("[dbo].[sp_ModificarCobro]", parameters);

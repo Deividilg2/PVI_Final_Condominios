@@ -118,8 +118,6 @@
 
         function loadDropdown(url, parametros, ddl, selected) {//Parametros que va a recibir nuestra funcion
             $.post(url, parametros, function (data) {//Elegimos el metodo por el que sera enviado
-                ddl.empty();//Vaciamos el ddl
-                ddl.append("<option value=''>Seleccione una opcion</option");
                 $(data).each(function () {
                     var option = new Option(this.Nombre, this.Id);
                     if (this.Id == selected) {

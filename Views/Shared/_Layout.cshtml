@@ -8,6 +8,7 @@
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     <link href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.css" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
@@ -23,7 +24,22 @@
                     <li>@Html.ActionLink("Crear cobro", "Index", "Cobros", new { area = "" }, new { @class = "nav-link" })</li>
                     <li>@Html.ActionLink("Contacto", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
                 </ul>
+                @if(Session["Nombreusuario"] != null)
+                {
+            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-end">
+                <ul class="navbar-nav flex-grow-2">
+                    <li class="nav-link">
+                        <label ID="lblnombre" Visible="true" class="text-light" style="font-size:23px">@Html.Raw(Session["Nombreusuario"])</label>
+                    </li>
+                    <li class="nav-link">
+                        <button ID="btnCierresesion" Visible="true" class="btn btn-danger">Cerrar Sesión</button>
+                    </li>
+                </ul>
             </div>
+                }
+                
+                    
+                </div>
         </div>
     </nav>
     <div class="container body-content">

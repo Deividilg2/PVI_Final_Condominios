@@ -19,6 +19,21 @@ namespace PVI_Final_Condominios.Controllers
         // GET: Cobros
         public ActionResult ConsultarCobros()
         {
+            try
+            {
+                var cobro = new CobrosModels();
+                Servicios(cobro);
+            }
+            catch
+            {
+
+            }
+            
+            return View();
+        }
+
+        public JsonResult ListaCobros()
+        {
             //Creamos una variable para almacenar los atributos del modelo
             var list = new List<SpConsultarCobrosResult>();//Variable para almacenar los datos del SP de los empleados
             var cobro = new CobrosModels();
@@ -39,7 +54,7 @@ namespace PVI_Final_Condominios.Controllers
                     //}
 
                     list = db.SpConsultarCobros().ToList();//Almacenamos el resultado, del SP
-                    ServiciosyddlsdeFechas(cobro);
+                    Servicios(cobro);
                 }
             }
             catch
@@ -47,9 +62,9 @@ namespace PVI_Final_Condominios.Controllers
 
             }
 
-            return View(list);//Pasamos la lista del modelo
+            return Json(new { data = list }, JsonRequestBehavior.AllowGet);
         }
-        
+
         //Creamos este metodo para poder realizar la carga en caso de modificacion de datos
         public ActionResult CrearCobros(int? id)
         {//Creacion de una variable cobro con el modelo
@@ -77,7 +92,7 @@ namespace PVI_Final_Condominios.Controllers
                         anno = _.Anno,
                         estado = _.Estado
                     }).FirstOrDefault();//Especificamos que nos devuelva el primer resultado que deberia ser el unico
-                    ServiciosyddlsdeFechas(cobro);//Metodo que nos permite cargar la lista de los años, meses y los servicios en los Checkbox
+                    Servicios(cobro);//Metodo que nos permite cargar la lista de los años, meses y los servicios en los Checkbox
 
                 }
             }
@@ -102,17 +117,17 @@ namespace PVI_Final_Condominios.Controllers
                     var estadoCasa = db.SpConsultarEstadoCasaporPersona(cobro.idcasa,cobro.mes,cobro.anno).FirstOrDefault();
                     ViewBag.Estadocasa = estadoCasa;//Almacenamos dentro del ViewBag para pasarlo a la alerta en la vista
                     //Validamos que se inserte solo en el caso de que no existan registros pendientes en la casa seleccionada
+                        string serviciosSeleccionadosStr = string.Join(",", servicioSeleccionado);// Convertir la lista de servicios a una cadena separada por comas
                     if (cobro.idcobro == 0 && estadoCasa == null)
                     {
-                       
-                        db.SpInsertarCobro(cobro.idcasa, cobro.mes, cobro.anno, MontoServicios(servicioSeleccionado, cobro));//Tomamos el monto de una funcion
+                        db.SpInsertarCobro(cobro.idcasa, cobro.mes, cobro.anno, MontoServicios(servicioSeleccionado, cobro), serviciosSeleccionadosStr);//Tomamos el monto de una funcion
                         InsertarServiciosCobro(servicioSeleccionado, cobro, MontoServicios(servicioSeleccionado, cobro));//Realizamos el insert de los servicios en la tabla detallecobroos
                         resultado = "Se ha logrado guardar con exito";
 
                     }
                     else if(cobro.idcobro != 0)
                     {
-                        db.SpModificarCobro(cobro.idcobro, MontoServicios(servicioSeleccionado, cobro));//Modificamos unicamente el monto de los servicios
+                        db.SpModificarCobro(cobro.idcobro, MontoServicios(servicioSeleccionado, cobro), cobro.idCliente,cobro.idcasa, serviciosSeleccionadosStr);//Modificamos unicamente el monto de los servicios
                         InsertarServiciosCobro(servicioSeleccionado, cobro, MontoServicios(servicioSeleccionado, cobro));//Realizamos el insert de los servicios en la tabla detallecobroos
                         ViewBag.Estadocasa = estadoCasa = null;//Actualizamos para que la alerta en la vista no salte
                         resultado = "Se ha logrado modificar con exito";
@@ -122,7 +137,7 @@ namespace PVI_Final_Condominios.Controllers
                         resultado = "Ya se encuentra un registro en la casa seleccionada";
                     }
                 }
-                ServiciosyddlsdeFechas(cobro);//Cargamos los servicios y los ddl de anno y mes
+                Servicios(cobro);//Cargamos los servicios y los ddl de anno y mes
 
             }
             catch
@@ -169,7 +184,7 @@ namespace PVI_Final_Condominios.Controllers
             return Json(list);
         }
 
-        public JsonResult DdlAnnos(int? anno)
+        public JsonResult DdlAnnos()
         {
             var list = new List<DropDownList>();
             try
@@ -189,7 +204,7 @@ namespace PVI_Final_Condominios.Controllers
             return Json(list);
         }
 
-        public JsonResult DdlMeses(int? mes)
+        public JsonResult DdlMeses()
         {
             var list = new List<DropDownList>();
             var textInfo = new System.Globalization.CultureInfo("es-ES", false).TextInfo;
@@ -197,7 +212,7 @@ namespace PVI_Final_Condominios.Controllers
             {
                 list = Enumerable.Range(1, 12).Select(m => new DropDownList
                 {
-                    Id = m, // El valor del mes (numérico)
+                    Id = m, // El valor del mes
                     Nombre = textInfo.ToTitleCase(new DateTime(1, m, 1).ToString("MMMM")) // Primera letra del mes en mayuscula, obteniendo la cultura es-ES 
                 }).ToList();
             }
@@ -265,15 +280,23 @@ namespace PVI_Final_Condominios.Controllers
             }
         }
 
-        public void ServiciosyddlsdeFechas(CobrosModels cobro)
+        public void Servicios(CobrosModels cobro)
         {
+            
+                try
+                {
+                using (var db = new PviProyectoFinalDB("MyDatabase"))
+                {
+                    ViewBag.servicios = db.SpConsultarServicioscbx().ToList();
+                    ViewBag.serviciosSeleccionados = cobro != null ? //En caso de que se este insertando un nuevo cobro no genere un error
+                        db.SpConsultarServiciosporCobro(cobro.idcobro).Select(s => s.Id_servicio).ToList() : null;
+                }
+                }
+                catch
+                {
 
-            using (var db = new PviProyectoFinalDB("MyDatabase"))
-            {
-                ViewBag.servicios = db.SpConsultarServicioscbx().ToList();
-                ViewBag.serviciosSeleccionados = cobro != null ? //En caso de que se este insertando un nuevo cobro no genere un error
-                    db.SpConsultarServiciosporCobro(cobro.idcobro).Select(s => s.Id_servicio).ToList() : null;
-            }
+                }
+                
         }
 
 

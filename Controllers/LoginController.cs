@@ -59,23 +59,27 @@ namespace PVI_Final_Condominios.Controllers
                             //Validamos en caso de que la cuenta sea inactiva "I"
                             if (log.Estado == true)
                             {
-                                //Creamos una instancia de usuario para utilizar sus atributos
-                                LoginModels usuario = new LoginModels();
-                                usuario.id = log.IdPersona;
-                                usuario.nombreCompleto = log.Nombre;
-                                usuario.esEmpleado = log.TipoPersona;
+                            //Creamos una instancia de usuario para utilizar sus atributos
+                            LoginModels usuario = new LoginModels
+                            {
+                                id = log.IdPersona,
+                                nombreCompleto = log.Nombre +" "+ log.Apellido,
+                                esEmpleado = log.TipoPersona
+                            };
                                 //Realizamos una comprovación de si es o no empleado el usuario logeado
                                 if (log.TipoPersona == "Empleado")
                                 {//Asignamos el Estado empleado true para las paginas que le pertenecen al empleado y poder cambiarlo en 
                                  //las paginas que necesiten colocarlo como un cliente
                                     usuario.Estado = true;
                                     Session["Usuario"] = usuario;//Asignamos la sesion usuario con sus atributos
-                                    Response.Redirect("~/Login/Login", false);
+                                    Session["Nombreusuario"] = usuario.nombreCompleto;
+                                    Response.Redirect("~/Cobros/ConsultarCobros", false);
 
                                 }
                                 else
                                 {
                                     Session["Usuario"] = usuario;
+                                    Session["Nombreusuario"] = usuario.nombreCompleto;
                                     Response.Redirect($"~/Cobros/ConsultarCobros", false);
                                 }
                             }

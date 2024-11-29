@@ -23,148 +23,157 @@
         @Html.DropDownListFor(m => m.mes, (IEnumerable<SelectListItem>)ViewBag.meses, "Seleccione un mes", new { @class = "form-control" })
     </div>*@
 
-<button id="AbrirModal" class="btn btn-primary mb-2">Crear cobro</button>
-<table class="table table-bordered table-hover">
-    <tr>
-        <th># Cobro</th>
-        <th># Casa</th>
-        <th># Propietario</th>
-        <th>Periodo</th>
-        <th>Estado</th>
-    </tr>
 
-    @foreach (var cobros in Model)
-    {
-        <tr>
-            <td>@cobros.Id_cobro </td>
-            <td>@cobros.Id_casa</td>
-            <td>@cobros.Nombre</td>
-            <td>@cobros.Mes</td>
-            <td>@cobros.Estado</td>
-        </tr>
-    }
+    <button id="AbrirModal" class="btn btn-primary mb-2">Crear cobro</button>
 
 
-</table>
 
-<div id="dialog" title="CrearCobro">
-    @Html.Partial("CrearCobromodal")
-</div>
+    <table id="TablaCobros" style="width:100%" class="display">
+        <thead>
+            <tr>
+                <th># Cobro</th>
+                <th># Casa</th>
+                <th># Propietario</th>
+                <th>Periodo</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
 
-@section Scripts{
-    @Scripts.Render("~/bundles/jqueryval")
-    <script src="~/Scripts/ValidacionesGenericas 1.js"></script>
-    <script type="text/javascript">
-        $("#myform").validate({
-            rules: {
-                'idCliente': {
-                    required: true
+
+
+    </table>
+
+    <div id="dialog" title="CrearCobro">
+        @Html.Partial("CrearCobromodal")
+    </div>
+
+    @section Scripts{
+        @Scripts.Render("~/bundles/jqueryval")
+        <script src="~/Scripts/ValidacionesGenericas 1.js"></script>
+        <script src="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.js"></script>
+        <script type="text/javascript">
+            $("#myform").validate({
+                rules: {
+                    'idCliente': {
+                        required: true
+                    },
+                    'idCasa': {
+                        required: true,
+                    },
+                    'anno': {
+                        required: true
+                    },
+                    'costo': {
+                        required: true
+                    },
+                    'mes': {
+                        required: true
+                    },
+                    'servicio': {
+                        required: true
+                    },
                 },
-                'idCasa': {
-                    required: true,
-                },
-                'anno': {
-                    required: true
-                },
-                'costo': {
-                    required: true
-                },
-                'mes': {
-                    required: true
-                },
-                'servicio': {
-                    required: true
-                },
-            },
 
-            submitHandler: function (form) {
-                guardar();
-            } 
-        });
+                submitHandler: function (form) {
+                    guardar();
+                }
+            });
 
-        function guardar() {
-            var data = {
-                idCliente: $("#idCliente").val(),
-                idCasa: $("#idCasa").val(),
-                anno: $("#anno").val(),
-                mes: $("#mes").val(),
+            function guardar() {
+                var data = {
+                    idCliente: $("#idCliente").val(),
+                    idCasa: $("#idCasa").val(),
+                    anno: $("#anno").val(),
+                    mes: $("#mes").val(),
+                }
+
+                //Obtenemos todos los checkboxes seleccionados
+                var checkboxes = document.querySelectorAll("input[name='servicio']:checked");
+
+                //Creamos un arreglo para almacenar los valores de los checkboxes que seleccionamos
+                var serviciosSeleccionados = [];
+                checkboxes.forEach((checkbox) => {
+                    serviciosSeleccionados.push(parseInt(checkbox.value, 10)); // Convertimos a entero
+                });
+
+
+                console.log(data, serviciosSeleccionados);
+                $.post('/Cobros/CrearCobros', { cobro: data, servicioSeleccionado: serviciosSeleccionados }, function (data) {
+                    alert(data); location.reload();
+                });
             }
 
-            //Obtenemos todos los checkboxes seleccionados
-            var checkboxes = document.querySelectorAll("input[name='servicio']:checked");
 
-            //Creamos un arreglo para almacenar los valores de los checkboxes que seleccionamos
-            var serviciosSeleccionados = [];
-            checkboxes.forEach((checkbox) => {
-                serviciosSeleccionados.push(parseInt(checkbox.value, 10)); // Convertimos a entero
-            });
+            function loadDropdown(url, parametros, ddl, selected) {//Parametros que va a recibir nuestra funcion
+                $.post(url, parametros, function (data) {//Elegimos el metodo por el que sera enviado
+                    $(data).each(function () {
+                        var option = new Option(this.Nombre, this.Id);
+                        if (this.Id == selected) {
+                            option.selected = true;
+                        }
+                        ddl.append(option);
+                    });
+                });
+            };
 
+            function setChanges() {
+                $("#idCliente").change(function () {
+                    loadDropdown("/Cobros/DdlCasas", { Id: $("#idCliente").val() }, $("#idCasa"));
+                    cleanDropdown($("#idCasa"));
+                });
+            };
 
-            console.log(data, serviciosSeleccionados);
-            $.post('/Cobros/CrearCobros', { cobro: data, servicioSeleccionado: serviciosSeleccionados }, function (data) {
-                alert(data); location.reload();
-            });
-        }
+            function cleanDropdown(ddl) {
+                ddl.empty();
+                ddl.append("<option value=''>Seleccione una opcion</option>");
+            };
 
-       
-        function loadDropdown(url, parametros, ddl, selected) {//Parametros que va a recibir nuestra funcion
-            $.post(url, parametros, function (data) {//Elegimos el metodo por el que sera enviado
-                ddl.empty();//Vaciamos el ddl
-                ddl.append("<option value=''>Seleccione una opcion</option");
-                $(data).each(function () {
-                    var option = new Option(this.Nombre, this.Id);
-                    if (this.Id == selected) {
-                        option.selected = true;
+            $(document).ready(function () {
+                new DataTable("#TablaCobros", {
+                    ajax: "/Cobros/ListaCobros",
+                    columns: [
+                        { data: 'Id_cobro' },
+                        { data: 'Id_casa' },
+                        { data: 'Nombre' },
+                        { data: 'Mes' },
+                        { data: 'Estado' }
+                    ],
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/es-MX.json',
                     }
-                    ddl.append(option);
+                });
+
+                loadDropdown("/Cobros/DdlClientes", {}, $("#idCliente"));
+                loadDropdown("/Cobros/DdlAnnos", {}, $("#anno"));
+                loadDropdown("/Cobros/DdlMeses", {}, $("#mes"));
+
+
+                setChanges();
+
+                //Alerta que salta cuando la casa ya tiene un cobro pendiente
+                $("#modalAlert").dialog({
+                    dialogClass: "alert",
+                    autoOpen: true,
+                    buttons: [
+                        {
+                            text: "OK",
+                            click: function () {
+                                $(this).dialog("close");
+                            }
+                        }
+                    ]
+                });
+
+                $("#dialog").dialog({
+                    modal: true,
+                    autoOpen: false,
+                    width: 320
+                });
+
+                $("#AbrirModal").on("click", function () {
+                    $("#dialog").dialog("open");
                 });
             });
-        };
 
-        function setChanges() {
-            $("#idCliente").change(function () {
-                loadDropdown("/Cobros/DdlCasas", { Id: $("#idCliente").val() }, $("#idCasa"));
-                cleanDropdown($("#idCasa"));
-            });
-        };
-
-        function cleanDropdown(ddl) {
-            ddl.empty();
-            ddl.append("<option value=''>Seleccione una opcion</option>");
-        };
-
-        $(document).ready(function () {
-            loadDropdown("/Cobros/DdlClientes", {}, $("#idCliente"));
-            loadDropdown("/Cobros/DdlAnnos", {}, $("#anno"));
-            loadDropdown("/Cobros/DdlMeses", {}, $("#mes"));
-
-
-            setChanges();
-
-            //Alerta que salta cuando la casa ya tiene un cobro pendiente
-            $("#modalAlert").dialog({
-                dialogClass: "alert",
-                autoOpen: true,
-                buttons: [
-                    {
-                        text: "OK",
-                        click: function () {
-                            $(this).dialog("close");
-                        }
-                    }
-                ]
-            });
-
-            $("#dialog").dialog({
-                modal: true,
-                autoOpen: false,
-                width: 320
-            });
-
-            $("#AbrirModal").on("click", function () {
-                $("#dialog").dialog("open");
-            });
-        });
-
-    </script>
-}
+        </script>
+    }
