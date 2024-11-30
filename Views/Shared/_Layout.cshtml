@@ -26,16 +26,16 @@
                 </ul>
                 @if(Session["Nombreusuario"] != null)
                 {
-            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-end">
-                <ul class="navbar-nav flex-grow-2">
-                    <li class="nav-link">
-                        <label ID="lblnombre" Visible="true" class="text-light" style="font-size:23px">@Html.Raw(Session["Nombreusuario"])</label>
-                    </li>
-                    <li class="nav-link">
-                        <button ID="btnCierresesion" Visible="true" class="btn btn-danger">Cerrar Sesión</button>
-                    </li>
-                </ul>
-            </div>
+                <div class="collapse navbar-collapse d-sm-inline-flex justify-content-end">
+                    <ul class="navbar-nav flex-grow-2">
+                        <li class="nav-link">
+                            <label ID="lblnombre" Visible="true" class="text-light" style="font-size:23px">@Html.Raw(Session["Nombreusuario"])</label>
+                        </li>
+                        <li class="nav-link">
+                            <button ID="btnCierresesion" Visible="true" class="btn btn-danger">Cerrar Sesión</button>
+                        </li>
+                    </ul>
+                </div>
                 }
                 
                     

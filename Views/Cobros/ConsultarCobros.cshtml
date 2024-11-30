@@ -25,9 +25,6 @@
 
 
     <button id="AbrirModal" class="btn btn-primary mb-2">Crear cobro</button>
-
-
-
     <table id="TablaCobros" style="width:100%" class="display">
         <thead>
             <tr>
@@ -99,7 +96,7 @@
 
                 console.log(data, serviciosSeleccionados);
                 $.post('/Cobros/CrearCobros', { cobro: data, servicioSeleccionado: serviciosSeleccionados }, function (data) {
-                    alert(data); location.reload();
+                    alert(data);
                 });
             }
 
@@ -116,6 +113,7 @@
                 });
             };
 
+
             function setChanges() {
                 $("#idCliente").change(function () {
                     loadDropdown("/Cobros/DdlCasas", { Id: $("#idCliente").val() }, $("#idCasa"));
@@ -125,8 +123,10 @@
 
             function cleanDropdown(ddl) {
                 ddl.empty();
-                ddl.append("<option value=''>Seleccione una opcion</option>");
+                ddl.append("<option value=''>Seleccione una casa</option>");
             };
+
+
 
             $(document).ready(function () {
                 new DataTable("#TablaCobros", {
@@ -143,7 +143,15 @@
                     }
                 });
 
-                loadDropdown("/Cobros/DdlClientes", {}, $("#idCliente"));
+
+                
+                if ('@ViewBag.tipocliente' == "Cliente") {//Validamos que sea cliente para seleccionar una opcion por defecto
+                    loadDropdown("/Cobros/DdlClientes", {}, $("#idCliente"), @ViewBag.idCliente);
+                } else {
+                    loadDropdown("/Cobros/DdlClientes", {}, $("#idCliente"));//Cargamos todo el DDL
+                }
+
+
                 loadDropdown("/Cobros/DdlAnnos", {}, $("#anno"));
                 loadDropdown("/Cobros/DdlMeses", {}, $("#mes"));
 
@@ -153,7 +161,7 @@
                 //Alerta que salta cuando la casa ya tiene un cobro pendiente
                 $("#modalAlert").dialog({
                     dialogClass: "alert",
-                    autoOpen: true,
+                    autoOpen: false,
                     buttons: [
                         {
                             text: "OK",

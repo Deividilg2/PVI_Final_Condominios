@@ -2,6 +2,7 @@
 using Microsoft.Ajax.Utilities;
 using PVI_Final_Condominios.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Drawing;
@@ -21,6 +22,9 @@ namespace PVI_Final_Condominios.Controllers
         {
             try
             {
+                LoginModels usuario = Session["Usuario"] as LoginModels;
+                ViewBag.tipocliente = usuario.esEmpleado;//Lo usamos para bloqeuar el ddl en la vista parcial
+                ViewBag.idCliente = usuario.id;//Esto nos ayuda a seleccionar por defecto un cliente
                 var cobro = new CobrosModels();
                 Servicios(cobro);
             }
@@ -152,12 +156,20 @@ namespace PVI_Final_Condominios.Controllers
 
         public JsonResult DdlClientes()
         {//Ddl que usamos para cargar a los clientes activos
+            LoginModels usuario = Session["Usuario"] as LoginModels;
             var list = new List<DropDownList>();//Variable que va a guardar la estructura del modelo DDL
             try
             {
                 using(var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
                 {//Almacenamos en list los id y nombres de las personas para el ddl de la vista
-                    list = db.SpConsultarPersona().Select(_ => new DropDownList { Id = _.IdPersona, Nombre = _.Nombre }).ToList();         
+                    //Cargamos con normalidad todos los clientes activos
+                    list = db.SpConsultarPersona().Select(_ => new DropDownList { Id = _.IdPersona, Nombre = _.Nombre + " " + _.Apellido }).ToList();
+
+                    if (usuario.esEmpleado =="Cliente" && usuario.Estado == false)
+                    {   //Borramos todas las otras opciones existentes para evitar modificaciones desde el navegador
+                        list = list.Where(item => item.Id == usuario.id).ToList();
+                    }
+                   
                 }
             }
             catch
@@ -193,7 +205,7 @@ namespace PVI_Final_Condominios.Controllers
                 list = Enumerable.Range(DateTime.Now.Year, 11)
                     .Select(a => new DropDownList
                     {
-                        Id = a,             // Usa el año como el ID
+                        Id = a,// Usa el año como el ID
                         Nombre = a.ToString() // Convierte el año en cadena para mostrarlo
                     })
                     .ToList();

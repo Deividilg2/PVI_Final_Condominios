@@ -1,12 +1,24 @@
 ﻿<h2>Crear Cobros</h2>
 
 <form method="post" id="myform">
+    @if (ViewBag.tipocliente == "Cliente")
+    {
+    <div class="md-3">
+        <label class="form-label" for="idCliente">Cliente</label>
+        <select disabled id="idCliente" name="idCliente" class="form-control">
+            <option value="">Seleccione un cliente</option>
+        </select>
+    </div>
+    }
+    else 
+    {
     <div class="md-3">
         <label class="form-label" for="idCliente">Cliente</label>
         <select id="idCliente" name="idCliente" class="form-control">
             <option value="">Seleccione un cliente</option>
         </select>
     </div>
+    }
 
     <div class="md-3">
         <label class="form-label" for="idCasa">Casa</label>
@@ -39,18 +51,18 @@
             </div>
         }
     </div>
+    @if (ViewBag.Estadocasa != null)//Nota: Se recarga la pagina al coincidir y se borran los datos selecionados
+    {
+        <div id="modalAlert" title="Alerta">
+            <p>No se ha logrado realizar el cobro debido a que existe un cobro pendiente en la casa elegida</p>
+        </div>
+    }
 
     <input type="submit" id="Guardado" class="btn btn-primary" value="Guardar" />
-    <a href="/Cobros/ConsultarCobros" class="btn btn-secondary">Regresar</a>
 </form>
 
 
-@if (ViewBag.Estadocasa != null)//Nota: Se recarga la pagina al coincidir y se borran los datos selecionados
-{
-    <div id="modalAlert" title="Alerta">
-        <p>No se ha logrado realizar el cobro debido a que existe un cobro pendiente en la casa elegida</p>
-    </div>
-}
+
 
 
 
