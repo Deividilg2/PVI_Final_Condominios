@@ -20,7 +20,7 @@
             </button>
             <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
-                    <li>@Html.ActionLink("Gestionar Casas", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li>@Html.ActionLink("Gestionar Casas", "ConsultarCasas", "GestionarCasas", new { area = "" }, new { @class = "nav-link" })</li>
                     <li>@Html.ActionLink("Crear cobro", "Index", "Cobros", new { area = "" }, new { @class = "nav-link" })</li>
                     <li>@Html.ActionLink("Contacto", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
                 </ul>
@@ -32,7 +32,7 @@
                             <label ID="lblnombre" Visible="true" class="text-light" style="font-size:23px">@Html.Raw(Session["Nombreusuario"])</label>
                         </li>
                         <li class="nav-link">
-                            <button ID="btnCierresesion" Visible="true" class="btn btn-danger">Cerrar Sesión</button>
+                            <a href="@Url.Action("CerrarSesion", "Login")" class="btn btn-danger">Cerrar Sesión</a>
                         </li>
                     </ul>
                 </div>
@@ -55,7 +55,7 @@
     </div>
 
     @Scripts.Render("~/bundles/jquery")
-<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"
         integrity="sha256-9zljDKpE/mQxmaR4V2cGVaQ7arF3CcXxarvgr7Sj8Uc="
         crossorigin="anonymous"></script>
     @RenderSection("scripts", required: false)

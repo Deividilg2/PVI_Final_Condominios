@@ -1,0 +1,153 @@
+﻿
+@{
+    ViewBag.Title = "ConsultarCasas";
+}
+
+<h2>Casas Registradas</h2>
+<button id="AbrirModal" class="btn btn-primary mb-2">Crear casa</button>
+<table id="TablaCasas" style="width:100%" class="display">
+    <thead>
+        <tr>
+            <th>Nombre de la casa</th>
+            <th>Mts Cuadrados</th>
+            <th>Núm.Habitaciones</th>
+            <th>Núm.Baños</th>
+            <th># Propietario</th>
+            <th>Fecha Construcción</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+</table>
+
+<div id="dialog" title="Crear Casa">
+    @Html.Partial("CrearCasasModal")
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/ValidacionesGenericas 1.js"></script>
+    <script src="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.js"></script>
+    <script type="text/javascript">
+        $("#myform").validate({
+            rules: {
+                'nombre': {
+                    required: true
+                },
+                'mtsCuadrados': {
+                    required: true,
+                },
+                'numHabitaciones': {
+                    required: true
+                },
+                'numBannos': {
+                    required: true
+                },
+                'idCliente': {
+                    required: true
+                },
+                'fechaConstr': {
+                    required: true
+                },
+            },
+
+            submitHandler: function (form) {
+                guardar();
+            }
+        });
+
+        function guardar() {
+            var data = {// Los nombres deben estar igual que en el modelo
+                nombreCasa: $("#nombre").val(),
+                metrosCuadrados: $("#mtsCuadrados").val(),
+                numeroHabitaciones: $("#numHabitaciones").val(),
+                numeroBannos: $("#numBannos").val(),
+                idPersona: $("#idCliente").val(),
+                fechaConstruccion: $("#fechaConstr").val(),
+            }
+
+            console.log(data);
+            $.post('/GestionarCasas/CrearCasas', { casa: data}, function (data) {
+                alert(data);
+            });
+        }
+
+        function loadDropdown(url, parametros, ddl, selected) {//Parametros que va a recibir nuestra funcion
+            $.post(url, parametros, function (data) {//Elegimos el metodo por el que sera enviado
+                $(data).each(function () {
+                    var option = new Option(this.Nombre, this.Id);
+                    if (this.Id == selected) {
+                        option.selected = true;
+                    }
+                    ddl.append(option);
+                });
+            });
+        };
+
+        $(document).ready(function () {
+            new DataTable("#TablaCasas", {
+                "processing": true,
+                ajax: "/GestionarCasas/ListaCasas",
+                columns: [
+                    { data: 'Nombre_casa' },
+                    { data: 'Metros_cuadrados' },
+                    { data: 'Numero_habitaciones' },
+                    { data: 'Numero_banos' },
+                    { data: 'Nombrecompleto' },
+                    {
+                        data: 'Fecha_construccion',
+                        render: function (data, type, row) {
+                            // Verifica si la fecha está en el formato /Date(XXXXXXXX)/ y convierte
+                            if (data && data.includes("/Date")) {
+                                var timestamp = data.match(/\d+/)[0]; // Extrae el timestamp
+                                var date = new Date(parseInt(timestamp)); // Convierte el timestamp a fecha
+                                var formattedDate = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + '-' +
+                                    (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1)) + '-' +
+                                    date.getFullYear(); // Formatea la fecha como dd/mm/yyyy
+                                return formattedDate;
+                            }
+                            return data; // Si no tiene formato /Date, retorna el valor original
+                        }
+                    },
+                    {
+                        data: 'Estado',
+                        render: function (data, type, row) {
+                            // Verificar si el valor de 'Estado' es true o false y mostrar "Activo" o "Inactivo"
+                            return data === true ? 'Activo' : 'Inactivo';
+                        }
+                    },
+                    {
+                        data: 'Id_casa', // Asegúrate de que el ID está disponible en el objeto 'row'
+                        render: function (data, type, row) {
+                            return `<a href="/GestionarCasas/CrearCasas?id=${data}" class="btn btn-primary btn-sm">Modificar</a>`;
+                        }
+                    }
+                ],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/es-MX.json',
+                }
+
+            });
+
+            loadDropdown("/GestionarCasas/DdlClientes", {}, $("#idCliente"));//Cargamos todo el DDL
+
+
+            $("#dialog").dialog({
+                modal: true,
+                autoOpen: false,
+                width: 320
+            });
+
+            $("#AbrirModal").on("click", function () {
+                $("#dialog").dialog("open");
+            });
+
+            $("#fechaConstr").datepicker({
+                dateFormat: "yy/mm/dd",
+                changeYear: true,
+                changeMonth: true,
+                yearRange: "-10:+2"
+            });
+
+        })
+    </script>
+}

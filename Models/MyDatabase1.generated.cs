@@ -313,6 +313,56 @@ namespace DataModels
 
 		#endregion
 
+		#region SpConsultarCasaExistente
+
+		public static IEnumerable<SpConsultarCasaExistenteResult> SpConsultarCasaExistente(this PviProyectoFinalDB dataConnection, string @nombreCasa, int? @idCasa)
+		{
+			var parameters = new []
+			{
+				new DataParameter("@nombreCasa", @nombreCasa, LinqToDB.DataType.NVarChar)
+				{
+					Size = 255
+				},
+				new DataParameter("@idCasa",     @idCasa,     LinqToDB.DataType.Int32)
+			};
+
+			return dataConnection.QueryProc<SpConsultarCasaExistenteResult>("[dbo].[sp_ConsultarCasaExistente]", parameters);
+		}
+
+		public partial class SpConsultarCasaExistenteResult
+		{
+			[Column("id_casa")            ] public int      Id_casa             { get; set; }
+			[Column("metros_cuadrados")   ] public int      Metros_cuadrados    { get; set; }
+			[Column("numero_habitaciones")] public int      Numero_habitaciones { get; set; }
+			[Column("numero_banos")       ] public int      Numero_banos        { get; set; }
+			[Column("id_persona")         ] public int      Id_persona          { get; set; }
+			[Column("fecha_construccion") ] public DateTime Fecha_construccion  { get; set; }
+			[Column("nombre_casa")        ] public string   Nombre_casa         { get; set; }
+		}
+
+		#endregion
+
+		#region SpConsultarCasas
+
+		public static IEnumerable<SpConsultarCasasResult> SpConsultarCasas(this PviProyectoFinalDB dataConnection)
+		{
+			return dataConnection.QueryProc<SpConsultarCasasResult>("[dbo].[sp_ConsultarCasas]");
+		}
+
+		public partial class SpConsultarCasasResult
+		{
+			[Column("id_casa")            ] public int      Id_casa             { get; set; }
+			[Column("nombre_casa")        ] public string   Nombre_casa         { get; set; }
+			[Column("metros_cuadrados")   ] public int      Metros_cuadrados    { get; set; }
+			[Column("numero_banos")       ] public int      Numero_banos        { get; set; }
+			[Column("numero_habitaciones")] public int      Numero_habitaciones { get; set; }
+			[Column("nombrecompleto")     ] public string   Nombrecompleto      { get; set; }
+			[Column("fecha_construccion") ] public DateTime Fecha_construccion  { get; set; }
+			[Column("estado")             ] public bool?    Estado              { get; set; }
+		}
+
+		#endregion
+
 		#region SpConsultarCategorias
 
 		public static IEnumerable<Categoria> SpConsultarCategorias(this PviProyectoFinalDB dataConnection)
@@ -656,7 +706,7 @@ namespace DataModels
 
 		#region SpInsertarCasa
 
-		public static int SpInsertarCasa(this PviProyectoFinalDB dataConnection, string @nombreCasa, double? @metrosCuadrados, int? @numeroHabitaciones, int? @numeroBanos, decimal? @precio, int? @idPersona, DateTime? @fechaConstruccion, bool? @estado)
+		public static int SpInsertarCasa(this PviProyectoFinalDB dataConnection, string @nombreCasa, double? @metrosCuadrados, int? @numeroHabitaciones, int? @numeroBanos, decimal? @precio, int? @idPersona, DateTime? @fechaConstruccion)
 		{
 			var parameters = new []
 			{
@@ -669,8 +719,7 @@ namespace DataModels
 				new DataParameter("@numero_banos",        @numeroBanos,        LinqToDB.DataType.Int32),
 				new DataParameter("@precio",              @precio,             LinqToDB.DataType.Decimal),
 				new DataParameter("@id_persona",          @idPersona,          LinqToDB.DataType.Int32),
-				new DataParameter("@fecha_construccion",  @fechaConstruccion,  LinqToDB.DataType.Date),
-				new DataParameter("@estado",              @estado,             LinqToDB.DataType.Boolean)
+				new DataParameter("@fecha_construccion",  @fechaConstruccion,  LinqToDB.DataType.Date)
 			};
 
 			return dataConnection.ExecuteProc("[dbo].[sp_InsertarCasa]", parameters);
@@ -741,22 +790,14 @@ namespace DataModels
 
 		#region SpModificarCasa
 
-		public static int SpModificarCasa(this PviProyectoFinalDB dataConnection, int? @idCasa, string @nombreCasa, double? @metrosCuadrados, int? @numeroHabitaciones, int? @numeroBanos, decimal? @precio, int? @idPersona, DateTime? @fechaConstruccion, bool? @estado)
+		public static int SpModificarCasa(this PviProyectoFinalDB dataConnection, int? @idCasa, int? @numeroHabitaciones, int? @numeroBanos, decimal? @precio)
 		{
 			var parameters = new []
 			{
 				new DataParameter("@id_casa",             @idCasa,             LinqToDB.DataType.Int32),
-				new DataParameter("@nombre_casa",         @nombreCasa,         LinqToDB.DataType.NVarChar)
-				{
-					Size = 255
-				},
-				new DataParameter("@metros_cuadrados",    @metrosCuadrados,    LinqToDB.DataType.Double),
 				new DataParameter("@numero_habitaciones", @numeroHabitaciones, LinqToDB.DataType.Int32),
 				new DataParameter("@numero_banos",        @numeroBanos,        LinqToDB.DataType.Int32),
-				new DataParameter("@precio",              @precio,             LinqToDB.DataType.Decimal),
-				new DataParameter("@id_persona",          @idPersona,          LinqToDB.DataType.Int32),
-				new DataParameter("@fecha_construccion",  @fechaConstruccion,  LinqToDB.DataType.Date),
-				new DataParameter("@estado",              @estado,             LinqToDB.DataType.Boolean)
+				new DataParameter("@precio",              @precio,             LinqToDB.DataType.Decimal)
 			};
 
 			return dataConnection.ExecuteProc("[dbo].[sp_ModificarCasa]", parameters);

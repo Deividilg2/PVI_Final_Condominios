@@ -98,5 +98,11 @@ namespace PVI_Final_Condominios.Controllers
             return View();
 
         }
+        [HttpGet]
+        public ActionResult CerrarSesion()
+        {
+            Session.RemoveAll(); // Elimina todos los datos de sesión
+            return RedirectToAction("Login", "Login"); // Redirige al login u otra página   
+        }
     }
 }

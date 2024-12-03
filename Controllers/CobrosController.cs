@@ -22,17 +22,26 @@ namespace PVI_Final_Condominios.Controllers
         {
             try
             {
-                LoginModels usuario = Session["Usuario"] as LoginModels;
-                ViewBag.tipocliente = usuario.esEmpleado;//Lo usamos para bloqeuar el ddl en la vista parcial
-                ViewBag.idCliente = usuario.id;//Esto nos ayuda a seleccionar por defecto un cliente
-                var cobro = new CobrosModels();
-                Servicios(cobro);
+                ////Validamos la sesion del usuario activa
+                if (Session["Usuario"] == null)
+                {
+                    return RedirectToAction("Login", "Login");
+                }
+                else
+                {
+                    LoginModels usuario = (LoginModels)Session["Usuario"];
+                    ViewBag.tipocliente = usuario.esEmpleado;//Lo usamos para bloqeuar el ddl en la vista parcial
+                    ViewBag.idCliente = usuario.id;//Esto nos ayuda a seleccionar por defecto un cliente
+                    var cobro = new CobrosModels();
+                    Servicios(cobro);
+                }
             }
-            catch
+            catch (Exception)
             {
 
+                throw;
             }
-            
+
             return View();
         }
 
@@ -48,13 +57,13 @@ namespace PVI_Final_Condominios.Controllers
                     ////Validamos la sesion del usuario activa
                     //if (Session["Usuario"] == null)
                     //{
-                    //    Response.Redirect("~/Pages/Login.aspx");
+                    //    return RedirectToAction("~/Login/Login");
                     //}
                     ////Creamos una instancia de Usuario para tomar los datos  del usuario
                     //LoginModels usuario = (LoginModels)Session["Usuario"];
                     //if (usuario.esEmpleado == "Cliente")//Validamos que el usuario sea un empleado para poder entrar
                     //{
-                    //    Response.Redirect("~/Cobros/CrearCobros", false);
+                    //    return RedirectToAction("~/Cobros/CrearCobros");
                     //}
 
                     list = db.SpConsultarCobros().ToList();//Almacenamos el resultado, del SP
@@ -310,7 +319,6 @@ namespace PVI_Final_Condominios.Controllers
                 }
                 
         }
-
 
     }
 }

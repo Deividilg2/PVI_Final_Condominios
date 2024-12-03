@@ -1,0 +1,41 @@
+﻿@model PVI_Final_Condominios.Models.GestionarCasasModels
+@{
+    ViewBag.Title = "ModificarCasas";
+}
+
+<h2>ModificarCasas</h2>
+
+<form method="post" id="casasform">
+    @Html.HiddenFor(model => model.idCasa)
+    <div class="mb-3">
+        <label class="form-label" for="nombreCasa">Casa</label>
+        @Html.TextBoxFor(model => model.nombreCasa, new { @class = "form-control", @disabled = "disabled" })
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="metrosCuadrados">Metros Cuadrados</label>
+        @Html.TextBoxFor(model => model.metrosCuadrados, new { @class = "form-control", @disabled = "disabled" })
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="numeroHabitaciones">Número de habitaciónes</label>
+        @Html.TextBoxFor(model => model.numeroHabitaciones, new { @class = "form-control" })
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="numeroBannos">Número de baños</label>
+        @Html.TextBoxFor(model => model.numeroBannos, new { @class = "form-control" })
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="metrosCuadrados">Metros Cuadrados</label>
+        @Html.TextBoxFor(model => model.metrosCuadrados, new { @class = "form-control", @disabled = "disabled" })
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="idPersona">Cliente</label>
+        @Html.TextBoxFor(model => model.idPersona, new { @class = "form-control", @disabled = "disabled" })
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="fechaConstruccion">Fecha de construcción</label>
+        @Html.TextBoxFor(model => model.fechaConstruccion, new { @class = "form-control", @disabled = "disabled" })
+    </div>
+    <input type="submit" value="Guardar" id="Guardar" class="btn btn-primary" />
+    <input type="button" value="Inactivar" id="Inactivar" class="btn btn-danger" />
+    <a href="~/GestionarCasas/ConsultarCasas" class="btn btn-dark">Regresar</a>
+</form>

@@ -1,5 +1,4 @@
-﻿@model List<DataModels.PviProyectoFinalDBStoredProcedures.SpConsultarCobrosResult>
-
+﻿
 @{
     ViewBag.Title = "ConsultarCobros";
 }
@@ -40,7 +39,7 @@
 
     </table>
 
-    <div id="dialog" title="CrearCobro">
+    <div id="dialog" title="Crear Cobro">
         @Html.Partial("CrearCobromodal")
     </div>
 
@@ -51,7 +50,7 @@
         <script type="text/javascript">
             $("#myform").validate({
                 rules: {
-                    'idCliente': {
+                    'idCliente': {  
                         required: true
                     },
                     'idCasa': {
@@ -68,7 +67,7 @@
                     },
                     'servicio': {
                         required: true
-                    },
+                    }
                 },
 
                 submitHandler: function (form) {
@@ -144,20 +143,19 @@
                 });
 
 
-                
+
                 if ('@ViewBag.tipocliente' == "Cliente") {//Validamos que sea cliente para seleccionar una opcion por defecto
                     loadDropdown("/Cobros/DdlClientes", {}, $("#idCliente"), @ViewBag.idCliente);
+                    loadDropdown("/Cobros/DdlCasas", { Id: @ViewBag.idCliente }, $("#idCasa"));
                 } else {
                     loadDropdown("/Cobros/DdlClientes", {}, $("#idCliente"));//Cargamos todo el DDL
+                    loadDropdown("/Cobros/DdlCasas", {}, $("#idCasa"));
                 }
-
-
                 loadDropdown("/Cobros/DdlAnnos", {}, $("#anno"));
                 loadDropdown("/Cobros/DdlMeses", {}, $("#mes"));
-
-
                 setChanges();
 
+                
                 //Alerta que salta cuando la casa ya tiene un cobro pendiente
                 $("#modalAlert").dialog({
                     dialogClass: "alert",
