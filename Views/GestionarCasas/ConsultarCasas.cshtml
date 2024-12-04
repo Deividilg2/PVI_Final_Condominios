@@ -118,7 +118,11 @@
                     {
                         data: 'Id_casa', // Asegúrate de que el ID está disponible en el objeto 'row'
                         render: function (data, type, row) {
-                            return `<a href="/GestionarCasas/CrearCasas?id=${data}" class="btn btn-primary btn-sm">Modificar</a>`;
+                            if (row.Estado === true) {
+                                return `<a href="/GestionarCasas/CrearCasas?id=${data}" class="btn btn-primary btn-sm">Modificar</a>`;
+                            } else {
+                                return '<span class="text-muted">No disponible</span>';
+                            }
                         }
                     }
                 ],

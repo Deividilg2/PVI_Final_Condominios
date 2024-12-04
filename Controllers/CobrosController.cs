@@ -57,7 +57,7 @@ namespace PVI_Final_Condominios.Controllers
                     ////Validamos la sesion del usuario activa
                     //if (Session["Usuario"] == null)
                     //{
-                    //    return RedirectToAction("~/Login/Login");
+                    //    return RedirectToAction("Login", "Login");
                     //}
                     ////Creamos una instancia de Usuario para tomar los datos  del usuario
                     //LoginModels usuario = (LoginModels)Session["Usuario"];
@@ -82,21 +82,19 @@ namespace PVI_Final_Condominios.Controllers
         public ActionResult CrearCobros(int? id)
         {//Creacion de una variable cobro con el modelo
             var cobro = new CobrosModels();
-            //if (Session["Usuario"] == null)
-            //{
-            //    Response.Redirect("~/Pages/Login.aspx");
-            //}
-            ////Creamos una instancia de Usuario para tomar los datos  del usuario
-            //LoginModels usuario = (LoginModels)Session["Usuario"];
-            //if (usuario.esEmpleado == "Cliente")//Validamos que el usuario sea un empleado para poder entrar
-            //{
-            //    Response.Redirect("~/Cobros/CrearCobros", false);
-            //}
+            LoginModels usuario = (LoginModels)Session["Usuario"];
+            //Creamos una instancia de Usuario para tomar los datos  del usuario
+
+            if (Session["Usuario"] == null)
+            {
+                return RedirectToAction("Login", "Login");
+            }
+            
             try
             {//Conexion a la base de datps
                 using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
                 {//Cargamos en la variable con la estructura del modelo la consulta de los datos del cobro especifico
-                    cobro = db.SpConsultarCobroporId(id).Select(_ => new CobrosModels
+                    cobro = db.SpConsultarCobroporId(id, usuario.id, usuario.esEmpleado).Select(_ => new CobrosModels
                     {//Mapeamos los datos al modelo
                         idcobro = _.Id_cobro,
                         idCliente = _.Id_persona,
@@ -105,8 +103,12 @@ namespace PVI_Final_Condominios.Controllers
                         anno = _.Anno,
                         estado = _.Estado
                     }).FirstOrDefault();//Especificamos que nos devuelva el primer resultado que deberia ser el unico
-                    Servicios(cobro);//Metodo que nos permite cargar la lista de los años, meses y los servicios en los Checkbox
 
+                    if (cobro == null )
+                    {
+                        return RedirectToAction("ConsultarCobros", "Cobros");
+                    }
+                    Servicios(cobro);//Metodo que nos permite cargar la lista de los años, meses y los servicios en los Checkbox
                 }
             }
             catch
@@ -134,14 +136,14 @@ namespace PVI_Final_Condominios.Controllers
                     if (cobro.idcobro == 0 && estadoCasa == null)
                     {
                         db.SpInsertarCobro(cobro.idcasa, cobro.mes, cobro.anno, MontoServicios(servicioSeleccionado, cobro), serviciosSeleccionadosStr);//Tomamos el monto de una funcion
-                        InsertarServiciosCobro(servicioSeleccionado, cobro, MontoServicios(servicioSeleccionado, cobro));//Realizamos el insert de los servicios en la tabla detallecobroos
+                        InsertarServiciosCobro(servicioSeleccionado, cobro);//Realizamos el insert de los servicios en la tabla detallecobroos
                         resultado = "Se ha logrado guardar con exito";
 
                     }
                     else if(cobro.idcobro != 0)
                     {
                         db.SpModificarCobro(cobro.idcobro, MontoServicios(servicioSeleccionado, cobro), cobro.idCliente,cobro.idcasa, serviciosSeleccionadosStr);//Modificamos unicamente el monto de los servicios
-                        InsertarServiciosCobro(servicioSeleccionado, cobro, MontoServicios(servicioSeleccionado, cobro));//Realizamos el insert de los servicios en la tabla detallecobroos
+                        InsertarServiciosCobro(servicioSeleccionado, cobro);//Realizamos el insert de los servicios en la tabla detallecobroos
                         ViewBag.Estadocasa = estadoCasa = null;//Actualizamos para que la alerta en la vista no salte
                         resultado = "Se ha logrado modificar con exito";
                     }
@@ -271,7 +273,7 @@ namespace PVI_Final_Condominios.Controllers
             return monto;
         }
 
-        public void InsertarServiciosCobro(List<int> servicioSeleccionado, CobrosModels cobro, decimal monto)
+        public void InsertarServiciosCobro(List<int> servicioSeleccionado, CobrosModels cobro)
         {
             try
             {
@@ -286,7 +288,7 @@ namespace PVI_Final_Condominios.Controllers
                         var servicioaEliminar = serviciosexistentes.Except(servicioSeleccionado).ToList();//Tomamos los servicios que ya no estan seleccionados
                         foreach (var servicioId in serviciosInsertar)
                         {
-                            db.SpInsertarDetalleCobro(servicioId, cobro.idcobro, cobro.idcasa, cobro.mes, cobro.anno, monto);
+                            db.SpInsertarDetalleCobro(servicioId, cobro.idcobro);
                         }
                         foreach (var servicioId in servicioaEliminar)
                         {

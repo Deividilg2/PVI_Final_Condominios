@@ -395,11 +395,16 @@ namespace DataModels
 
 		#region SpConsultarCobroporId
 
-		public static IEnumerable<SpConsultarCobroporIdResult> SpConsultarCobroporId(this PviProyectoFinalDB dataConnection, int? @idCobro)
+		public static IEnumerable<SpConsultarCobroporIdResult> SpConsultarCobroporId(this PviProyectoFinalDB dataConnection, int? @idCobro, int? @idUsuario, string @tipopersona)
 		{
 			var parameters = new []
 			{
-				new DataParameter("@idCobro", @idCobro, LinqToDB.DataType.Int32)
+				new DataParameter("@idCobro",     @idCobro,     LinqToDB.DataType.Int32),
+				new DataParameter("@idUsuario",   @idUsuario,   LinqToDB.DataType.Int32),
+				new DataParameter("@tipopersona", @tipopersona, LinqToDB.DataType.VarChar)
+				{
+					Size = 50
+				}
 			};
 
 			return dataConnection.QueryProc<SpConsultarCobroporIdResult>("[dbo].[sp_ConsultarCobroporId]", parameters);
@@ -750,16 +755,12 @@ namespace DataModels
 
 		#region SpInsertarDetalleCobro
 
-		public static int SpInsertarDetalleCobro(this PviProyectoFinalDB dataConnection, int? @IdServicio, int? @IdCobro, int? @IdCasa, int? @mes, int? @anno, decimal? @monto)
+		public static int SpInsertarDetalleCobro(this PviProyectoFinalDB dataConnection, int? @IdServicio, int? @IdCobro)
 		{
 			var parameters = new []
 			{
 				new DataParameter("@IdServicio", @IdServicio, LinqToDB.DataType.Int32),
-				new DataParameter("@IdCobro",    @IdCobro,    LinqToDB.DataType.Int32),
-				new DataParameter("@IdCasa",     @IdCasa,     LinqToDB.DataType.Int32),
-				new DataParameter("@mes",        @mes,        LinqToDB.DataType.Int32),
-				new DataParameter("@anno",       @anno,       LinqToDB.DataType.Int32),
-				new DataParameter("@monto",      @monto,      LinqToDB.DataType.Decimal)
+				new DataParameter("@IdCobro",    @IdCobro,    LinqToDB.DataType.Int32)
 			};
 
 			return dataConnection.ExecuteProc("[dbo].[sp_InsertarDetalleCobro]", parameters);

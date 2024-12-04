@@ -17,15 +17,16 @@ namespace PVI_Final_Condominios.Controllers
         {
             try
             {
-                //LoginModels usuario = (LoginModels)Session["Usuario"];
-                //////Validamos la sesion del usuario activa
-                //if (Session["Usuario"] == null)
-                //{
-                //    return RedirectToAction("Login", "Login");
-                //} else if (usuario.esEmpleado == "Cliente")
-                //{
-                //    return RedirectToAction("ConsultarCobros","Cobros");
-                //}
+                LoginModels usuario = (LoginModels)Session["Usuario"];
+                ////Validamos la sesion del usuario activa
+                if (Session["Usuario"] == null)
+                {
+                    return RedirectToAction("Login", "Login");
+                }
+                else if (usuario.esEmpleado == "Cliente")
+                {
+                    return RedirectToAction("ConsultarCobros", "Cobros");
+                }
             }
             catch 
             {

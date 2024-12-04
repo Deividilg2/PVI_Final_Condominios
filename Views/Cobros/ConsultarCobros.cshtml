@@ -3,6 +3,7 @@
     ViewBag.Title = "ConsultarCobros";
 }
 
+
 <h2>Consultar Cobros</h2>
 
 @*<div class="md-3">
@@ -129,13 +130,20 @@
 
             $(document).ready(function () {
                 new DataTable("#TablaCobros", {
+                    "processing": true,
                     ajax: "/Cobros/ListaCobros",
                     columns: [
                         { data: 'Id_cobro' },
                         { data: 'Id_casa' },
                         { data: 'Nombre' },
                         { data: 'Mes' },
-                        { data: 'Estado' }
+                        { data: 'Estado' },
+                        {
+                            data: 'Id_cobro', // Asegúrate de que el ID está disponible en el objeto 'row'
+                            render: function (data, type, row) {
+                              return `<a href="/Cobros/CrearCobros?id=${data}" class="btn btn-primary btn-sm">Modificar</a>`;
+                            }
+                        }
                     ],
                     language: {
                         url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/es-MX.json',
