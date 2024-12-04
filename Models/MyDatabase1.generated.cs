@@ -338,6 +338,8 @@ namespace DataModels
 			[Column("id_persona")         ] public int      Id_persona          { get; set; }
 			[Column("fecha_construccion") ] public DateTime Fecha_construccion  { get; set; }
 			[Column("nombre_casa")        ] public string   Nombre_casa         { get; set; }
+			[Column("precio")             ] public decimal  Precio              { get; set; }
+			                                public string   Estadodecobros      { get; set; }
 		}
 
 		#endregion
@@ -426,9 +428,18 @@ namespace DataModels
 
 		#region SpConsultarCobros
 
-		public static IEnumerable<SpConsultarCobrosResult> SpConsultarCobros(this PviProyectoFinalDB dataConnection)
+		public static IEnumerable<SpConsultarCobrosResult> SpConsultarCobros(this PviProyectoFinalDB dataConnection, int? @idCliente, string @tipopersona)
 		{
-			return dataConnection.QueryProc<SpConsultarCobrosResult>("[dbo].[sp_ConsultarCobros]");
+			var parameters = new []
+			{
+				new DataParameter("@idCliente",   @idCliente,   LinqToDB.DataType.Int32),
+				new DataParameter("@tipopersona", @tipopersona, LinqToDB.DataType.VarChar)
+				{
+					Size = 50
+				}
+			};
+
+			return dataConnection.QueryProc<SpConsultarCobrosResult>("[dbo].[sp_ConsultarCobros]", parameters);
 		}
 
 		public partial class SpConsultarCobrosResult
@@ -477,9 +488,14 @@ namespace DataModels
 
 		#region SpConsultarPersona
 
-		public static IEnumerable<Persona> SpConsultarPersona(this PviProyectoFinalDB dataConnection)
+		public static IEnumerable<Persona> SpConsultarPersona(this PviProyectoFinalDB dataConnection, bool? @Confirmacion)
 		{
-			return dataConnection.QueryProc<Persona>("[dbo].[sp_ConsultarPersona]");
+			var parameters = new []
+			{
+				new DataParameter("@Confirmacion", @Confirmacion, LinqToDB.DataType.Boolean)
+			};
+
+			return dataConnection.QueryProc<Persona>("[dbo].[sp_ConsultarPersona]", parameters);
 		}
 
 		#endregion
@@ -755,12 +771,15 @@ namespace DataModels
 
 		#region SpInsertarDetalleCobro
 
-		public static int SpInsertarDetalleCobro(this PviProyectoFinalDB dataConnection, int? @IdServicio, int? @IdCobro)
+		public static int SpInsertarDetalleCobro(this PviProyectoFinalDB dataConnection, int? @IdServicio, int? @IdCobro, int? @IdCasa, int? @mes, int? @anno)
 		{
 			var parameters = new []
 			{
 				new DataParameter("@IdServicio", @IdServicio, LinqToDB.DataType.Int32),
-				new DataParameter("@IdCobro",    @IdCobro,    LinqToDB.DataType.Int32)
+				new DataParameter("@IdCobro",    @IdCobro,    LinqToDB.DataType.Int32),
+				new DataParameter("@IdCasa",     @IdCasa,     LinqToDB.DataType.Int32),
+				new DataParameter("@mes",        @mes,        LinqToDB.DataType.Int32),
+				new DataParameter("@anno",       @anno,       LinqToDB.DataType.Int32)
 			};
 
 			return dataConnection.ExecuteProc("[dbo].[sp_InsertarDetalleCobro]", parameters);

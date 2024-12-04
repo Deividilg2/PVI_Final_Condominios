@@ -20,9 +20,14 @@
             </button>
             <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
-                    <li>@Html.ActionLink("Gestionar Casas", "ConsultarCasas", "GestionarCasas", new { area = "" }, new { @class = "nav-link" })</li>
-                    <li>@Html.ActionLink("Crear cobro", "Index", "Cobros", new { area = "" }, new { @class = "nav-link" })</li>
-                    <li>@Html.ActionLink("Contacto", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+
+                    @if (Session["Empleado"] != null)
+                    {
+                        <li>@Html.ActionLink("Gestionar Casas", "ConsultarCasas", "GestionarCasas", new { area = "" }, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Gestionar Servicios", "Index", "Cobros", new { area = "" }, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Contacto", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                    }
+
                 </ul>
                 @if(Session["Nombreusuario"] != null)
                 {

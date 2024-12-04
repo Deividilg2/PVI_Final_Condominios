@@ -7,10 +7,11 @@
     .midiv {
         height: 50%;
     }
-    .midiv span {
-        font-size: 1.5rem; /* Tamaño de la letra dentro de los spans */
-        color: #333; /* Cambia el color si es necesario */
-    }
+
+        .midiv span {
+            font-size: 1.5rem; /* Tamaño de la letra dentro de los spans */
+            color: #333; /* Cambia el color si es necesario */
+        }
 </style>
 
 @if (ViewBag.Text != null)
@@ -19,6 +20,7 @@
     <div class="alert alert-success midiv">
         <span>@ViewBag.Text</span>
     </div>
+    <a href="@ViewBag.Link" class="btn btn-dark">Regresar</a>
 }
 else if (ViewBag.Text2 != null)
 {

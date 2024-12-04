@@ -3,8 +3,17 @@
     ViewBag.Title = "ConsultarCobros";
 }
 
+@if (Session["Empleado"] != null)
+{
 
-<h2>Consultar Cobros</h2>
+
+    <h2>Consultar Cobros</h2>
+}
+else
+{
+    <h2>Mis Cobros</h2>
+}
+
 
 @*<div class="md-3">
     <label class="form-label" for="idCasa">Casa</label>
@@ -24,34 +33,34 @@
     </div>*@
 
 
-    <button id="AbrirModal" class="btn btn-primary mb-2">Crear cobro</button>
-    <table id="TablaCobros" style="width:100%" class="display">
-        <thead>
-            <tr>
-                <th># Cobro</th>
-                <th># Casa</th>
-                <th># Propietario</th>
-                <th>Periodo</th>
-                <th>Estado</th>
-            </tr>
-        </thead>
+<button id="AbrirModal" class="btn btn-primary mb-2">Crear cobro</button>
+<table id="TablaCobros" style="width:100%" class="display">
+    <thead>
+        <tr>
+            <th># Cobro</th>
+            <th># Casa</th>
+            <th># Propietario</th>
+            <th>Periodo</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
 
 
 
-    </table>
+</table>
 
-    <div id="dialog" title="Crear Cobro">
-        @Html.Partial("CrearCobromodal")
-    </div>
+<div id="dialog" title="Crear Cobro">
+    @Html.Partial("CrearCobromodal")
+</div>
 
-    @section Scripts{
-        @Scripts.Render("~/bundles/jqueryval")
-        <script src="~/Scripts/ValidacionesGenericas 1.js"></script>
-        <script src="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.js"></script>
-        <script type="text/javascript">
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/ValidacionesGenericas 1.js"></script>
+    <script src="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.js"></script>
+    <script type="text/javascript">
             $("#myform").validate({
                 rules: {
-                    'idCliente': {  
+                    'idCliente': {
                         required: true
                     },
                     'idCasa': {
@@ -97,6 +106,9 @@
                 console.log(data, serviciosSeleccionados);
                 $.post('/Cobros/CrearCobros', { cobro: data, servicioSeleccionado: serviciosSeleccionados }, function (data) {
                     alert(data);
+                    if (response === 'Cobro creado con éxito') {
+                        $("#modalAlert").dialog("open");  // Abre el diálogo de alerta
+                    }
                 });
             }
 
@@ -141,7 +153,18 @@
                         {
                             data: 'Id_cobro', // Asegúrate de que el ID está disponible en el objeto 'row'
                             render: function (data, type, row) {
-                              return `<a href="/Cobros/CrearCobros?id=${data}" class="btn btn-primary btn-sm">Modificar</a>`;
+                                // Convertimos año y mes a formato Date
+                                const cobroDate = new Date(Number(row.Anno), Number(row.Mes) - 1);
+                                const currentDate = new Date();
+                                // Validamos estados y fecha del cobro
+                                if (
+                                    row.Estado === 'Pagado' ||
+                                    row.Estado === 'Eliminado' ||
+                                    cobroDate <= currentDate) {
+                                    return '<span class="text-muted">No disponible</span>';
+                                } else {
+                                    return `<a href="/Cobros/CrearCobros?id=${data}" class="btn btn-primary btn-sm">Modificar</a>`;
+                                }
                             }
                         }
                     ],
@@ -163,20 +186,6 @@
                 loadDropdown("/Cobros/DdlMeses", {}, $("#mes"));
                 setChanges();
 
-                
-                //Alerta que salta cuando la casa ya tiene un cobro pendiente
-                $("#modalAlert").dialog({
-                    dialogClass: "alert",
-                    autoOpen: false,
-                    buttons: [
-                        {
-                            text: "OK",
-                            click: function () {
-                                $(this).dialog("close");
-                            }
-                        }
-                    ]
-                });
 
                 $("#dialog").dialog({
                     modal: true,
@@ -189,5 +198,5 @@
                 });
             });
 
-        </script>
-    }
+    </script>
+}

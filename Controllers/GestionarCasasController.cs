@@ -79,12 +79,17 @@ namespace PVI_Final_Condominios.Controllers
                         numeroHabitaciones = _.Numero_habitaciones,
                         numeroBannos = _.Numero_banos,
                         idPersona = _.Id_persona,
-                        fechaConstruccion = DateTime.Parse(_.Fecha_construccion.ToString("dd-MM-yyyy"))
+                        fechaConstruccion = DateTime.Parse(_.Fecha_construccion.ToString("dd-MM-yyyy")),
+                        estado = (_.Estadodecobros=="Pendiente")
                     }).FirstOrDefault();//Especificamos que nos devuelva el primer resultado que deberia ser el unico
                     if (casa == null)
                     {
-                        return RedirectToAction("Index", "Resultados", new { source = "CrearCasaM" });
+                        return RedirectToAction("Index", "Resultados", new { source = "BuscarCasaM" });
+                    }else if (casa != null && casa.estado == true)
+                    {
+                        return RedirectToAction("Index", "Resultados", new { source = "ModificarCasaM" });
                     }
+
                 }
             }
             catch
@@ -164,7 +169,7 @@ namespace PVI_Final_Condominios.Controllers
                 using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
                 {//Almacenamos en list los id y nombres de las personas para el ddl de la vista
                     //Cargamos con normalidad todos los clientes activos
-                    list = db.SpConsultarPersona().Select(_ => new DropDownList { Id = _.IdPersona, Nombre = _.Nombre + " " + _.Apellido }).ToList();
+                    list = db.SpConsultarPersona(true).Select(_ => new DropDownList { Id = _.IdPersona, Nombre = _.Nombre + " " + _.Apellido }).ToList();
                 }
             }
             catch

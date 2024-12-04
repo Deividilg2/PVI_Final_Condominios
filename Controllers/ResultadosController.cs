@@ -19,46 +19,33 @@ namespace PVI_Final_Condominios.Controllers
             //Tomamos el source para mostrar diversos mensajes de resultados BUENOS
                 switch (source)
                 {
-                    case "CrearReservacion":
-                        ViewBag.Text = "La reservación ha sido registrada exitosamente en el sistema";
-                        break;
-                    case "ModificarReservacion":
-                    ViewBag.Text = "Ha modificado correctamente la reservación";
-                        break;
-                    case "CancelarReservacion":
+                    case "CrearCobroB":
+                        ViewBag.Text = "El cobro se ha guardado con éxito";
+                    ViewBag.Link = "/Cobros/ConsultarCobros";
+                    break;
+                    case "ModificarCobroB":
+                    ViewBag.Text = "El cobro se ha modificado con éxito";
+                    ViewBag.Link = "/Cobros/ConsultarCobros";
+                    break;
+                    case "CrearCasaB":
                     ViewBag.Text = "La reservación ha sido cancelada con éxito";
-                        break;
-                    case "CrearHabitacion":
+                    ViewBag.Link = "/GestionarCasas/ConsultarCasas";
+                    break;
+                    case "ModificarCasaB":
                     ViewBag.Text = "Ha creado correctamente la habitación";
-                        break;
-                    case "EditarHabitacion":
-                    ViewBag.Text = "Se ha logrado modificar de forma correcta la habitación";
-                        break;
-                    case "Inactivarhabitacion":
-                    ViewBag.Text = "Se ha inactivado la habitación con éxito";
-                        break;
+                    ViewBag.Link = "/GestionarCasas/ConsultarCasas";
+                    break;
                 }
             //Tomamos el source para mostrar diversos mensajes de resultados MALOS
             switch (source)
             {
-                case "CrearCasaM":
+                case "BuscarCasaM":
                     ViewBag.Text2 = "La casa que busca no existe";
                     ViewBag.Link = "/GestionarCasas/ConsultarCasas";
                     break;
-                case "ModificarReservacion":
-                    ViewBag.Text2 = "Ha modificado correctamente la reservación";
-                    break;
-                case "CancelarReservacion":
-                    ViewBag.Text2 = "La reservación ha sido cancelada con éxito";
-                    break;
-                case "CrearHabitacion":
-                    ViewBag.Text2 = "Ha creado correctamente la habitación";
-                    break;
-                case "EditarHabitacion":
-                    ViewBag.Text2 = "Se ha logrado modificar de forma correcta la habitación";
-                    break;
-                case "Inactivarhabitacion":
-                    ViewBag.Text2 = "Se ha inactivado la habitación con éxito";
+                case "ModificarCasaM":
+                    ViewBag.Text2 = "No es posible modificar esta casa ya que tiene cobros pendientes";
+                    ViewBag.Link = "/GestionarCasas/ConsultarCasas";
                     break;
             }
             return View();

@@ -54,20 +54,20 @@ namespace PVI_Final_Condominios.Controllers
             {
                 using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
                 {
-                    ////Validamos la sesion del usuario activa
-                    //if (Session["Usuario"] == null)
-                    //{
-                    //    return RedirectToAction("Login", "Login");
-                    //}
-                    ////Creamos una instancia de Usuario para tomar los datos  del usuario
-                    //LoginModels usuario = (LoginModels)Session["Usuario"];
-                    //if (usuario.esEmpleado == "Cliente")//Validamos que el usuario sea un empleado para poder entrar
-                    //{
-                    //    return RedirectToAction("~/Cobros/CrearCobros");
-                    //}
+                    
+                    //Creamos una instancia de Usuario para tomar los datos  del usuario
+                    LoginModels usuario = (LoginModels)Session["Usuario"];
+                    if (usuario.esEmpleado == "Cliente")//Validamos que el usuario sea un empleado para poder entrar
+                    {
+                        list = db.SpConsultarCobros(usuario.id, usuario.esEmpleado).ToList();//Almacenamos el resultado, del SP
+                    }
+                    else
+                    {
+                        list = db.SpConsultarCobros(usuario.id, usuario.esEmpleado).ToList();//Almacenamos el resultado, del SP
+                    }
 
-                    list = db.SpConsultarCobros().ToList();//Almacenamos el resultado, del SP
-                    Servicios(cobro);
+                    
+                    
                 }
             }
             catch
@@ -104,8 +104,8 @@ namespace PVI_Final_Condominios.Controllers
                         estado = _.Estado
                     }).FirstOrDefault();//Especificamos que nos devuelva el primer resultado que deberia ser el unico
 
-                    if (cobro == null )
-                    {
+                    if (cobro == null || new DateTime(cobro.anno, cobro.mes, 1) <= DateTime.Now)//Evitamos el ingreso a cobros que no le pertenecen a los "clientes" y
+                    {//Evitamos que se puedan modificar cobros con fecha menor o igual al periodo actual
                         return RedirectToAction("ConsultarCobros", "Cobros");
                     }
                     Servicios(cobro);//Metodo que nos permite cargar la lista de los años, meses y los servicios en los Checkbox
@@ -137,19 +137,17 @@ namespace PVI_Final_Condominios.Controllers
                     {
                         db.SpInsertarCobro(cobro.idcasa, cobro.mes, cobro.anno, MontoServicios(servicioSeleccionado, cobro), serviciosSeleccionadosStr);//Tomamos el monto de una funcion
                         InsertarServiciosCobro(servicioSeleccionado, cobro);//Realizamos el insert de los servicios en la tabla detallecobroos
-                        resultado = "Se ha logrado guardar con exito";
-
+                        resultado = "El cobro se ha guardado con éxito";
                     }
                     else if(cobro.idcobro != 0)
                     {
                         db.SpModificarCobro(cobro.idcobro, MontoServicios(servicioSeleccionado, cobro), cobro.idCliente,cobro.idcasa, serviciosSeleccionadosStr);//Modificamos unicamente el monto de los servicios
                         InsertarServiciosCobro(servicioSeleccionado, cobro);//Realizamos el insert de los servicios en la tabla detallecobroos
-                        ViewBag.Estadocasa = estadoCasa = null;//Actualizamos para que la alerta en la vista no salte
-                        resultado = "Se ha logrado modificar con exito";
+                        resultado = "El cobro se ha modificado con éxito";
                     }
                     else
                     {
-                        resultado = "Ya se encuentra un registro en la casa seleccionada";
+                        resultado = "Ya hay un cobro existente en la casa seleccionada";
                     }
                 }
                 Servicios(cobro);//Cargamos los servicios y los ddl de anno y mes
@@ -174,7 +172,7 @@ namespace PVI_Final_Condominios.Controllers
                 using(var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
                 {//Almacenamos en list los id y nombres de las personas para el ddl de la vista
                     //Cargamos con normalidad todos los clientes activos
-                    list = db.SpConsultarPersona().Select(_ => new DropDownList { Id = _.IdPersona, Nombre = _.Nombre + " " + _.Apellido }).ToList();
+                    list = db.SpConsultarPersona(false).Select(_ => new DropDownList { Id = _.IdPersona, Nombre = _.Nombre + " " + _.Apellido }).ToList();
 
                     if (usuario.esEmpleado =="Cliente" && usuario.Estado == false)
                     {   //Borramos todas las otras opciones existentes para evitar modificaciones desde el navegador
@@ -256,7 +254,7 @@ namespace PVI_Final_Condominios.Controllers
                 {
                     using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD, por fuera del ciclo para evitar la repeticion de una conexion a la BD
                     {
-                        var datoscasa = db.SpConsultarCasaddl(cobro.idcasa).FirstOrDefault();
+                        var datoscasa = db.SpConsultarCasaExistente(null, cobro.idcasa).FirstOrDefault();
                         foreach (var servicioId in servicioSeleccionado)
                         {
                             var valor = db.SpConsultarPrecioServicioporId(servicioId).FirstOrDefault();
@@ -286,10 +284,12 @@ namespace PVI_Final_Condominios.Controllers
                         var serviciosInsertar = servicioSeleccionado.Except(serviciosexistentes).ToList();
                         //Comparamos las listas con Except, la lista servicioSeleccionado elimina los que si encuentra en la lista serviciosexistentes
                         var servicioaEliminar = serviciosexistentes.Except(servicioSeleccionado).ToList();//Tomamos los servicios que ya no estan seleccionados
+                        
                         foreach (var servicioId in serviciosInsertar)
                         {
-                            db.SpInsertarDetalleCobro(servicioId, cobro.idcobro);
+                            db.SpInsertarDetalleCobro(servicioId, cobro.idcobro, cobro.idcasa, cobro.mes, cobro.anno);
                         }
+                        
                         foreach (var servicioId in servicioaEliminar)
                         {
                             db.SpEliminarServiciodeCobro(servicioId);

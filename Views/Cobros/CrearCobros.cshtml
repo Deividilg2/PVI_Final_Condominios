@@ -56,18 +56,6 @@
 </form>
 
 
-@if (ViewBag.Estadocasa != null)//Nota: Se recarga la pagina al coincidir y se borran los datos selecionados
-{
-    <div id="modalAlert" title="Alerta">
-        <p>No se ha logrado realizar el cobro debido a que existe un cobro pendiente en la casa elegida</p>
-    </div>
-}
-
-
-@ViewBag.resultado
-
-
-
 @section Scripts{
     @Scripts.Render("~/bundles/jqueryval")
     <script src="~/Scripts/ValidacionesGenericas 1.js"></script>
@@ -151,21 +139,7 @@
                 loadDropdown("/Cobros/DdlCasas", { Id: idcliente }, $("#idCasa"), idcasa);
             }
             loadDropdown("/Cobros/DdlAnnos", {}, $("#anno"), anno);
-            loadDropdown("/Cobros/DdlMeses", {}, $("#mes"), mes);
-
-            //Alerta que salta cuando la casa ya tiene un cobro pendiente
-            $("#modalAlert").dialog({
-                dialogClass: "alert",
-                autoOpen: true,
-                buttons: [
-                    {
-                        text: "OK",
-                        click: function () {
-                            $(this).dialog("close");
-                        }
-                    }
-                ]
-            });
+            loadDropdown("/Cobros/DdlMeses", {}, $("#mes"), mes);            
         });
 
     </script>
