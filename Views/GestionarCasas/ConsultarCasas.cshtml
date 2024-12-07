@@ -28,6 +28,7 @@
     <script src="~/Scripts/ValidacionesGenericas 1.js"></script>
     <script src="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.js"></script>
     <script type="text/javascript">
+        var table;
         $("#myform").validate({
             rules: {
                 'nombre': {
@@ -67,7 +68,7 @@
 
             console.log(data);
             $.post('/GestionarCasas/CrearCasas', { casa: data}, function (data) {
-                alert(data);
+                alert(data); table.ajax.url("/Servicios/ListaCasas").load();
             });
         }
 
@@ -84,7 +85,7 @@
         };
 
         $(document).ready(function () {
-            new DataTable("#TablaCasas", {
+           table = new DataTable("#TablaCasas", {
                 "processing": true,
                 ajax: "/GestionarCasas/ListaCasas",
                 columns: [
@@ -143,6 +144,10 @@
 
             $("#AbrirModal").on("click", function () {
                 $("#dialog").dialog("open");
+            });
+
+            $("#cerrar").click(function () {
+                $("#dialog").dialog("close");
             });
 
             $("#fechaConstr").datepicker({

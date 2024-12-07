@@ -1,0 +1,145 @@
+﻿@model PVI_Final_Condominios.Models.ServiciosModels
+@{
+    ViewBag.Title = "CrearServicios";
+}
+
+<h2>CrearServicios</h2>
+
+<form method="post" id="serviciosform" action="/Servicios/CrearServicios">
+    @Html.HiddenFor(model => model.idservicio)
+    <div class="mb-3">
+        <label class="form-label" for="nombre">Nombre</label>
+        @Html.TextBoxFor(model => model.nombre, new { @class = "form-control", @disabled = "disabled", maxlength = "250" })
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="descripcion">Descripción</label>
+        @Html.TextAreaFor(model => model.descripcion, new { @class = "form-control", maxlength = "250" })
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="precio">Precio</label>
+        @Html.TextBoxFor(model => model.precio, new { @class = "form-control", step = "0.01", min = "1" })
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="categoria">Categoría</label>
+        <select disabled id="categoria" name="categoria" class="form-control">
+            <option value="">Seleccione una categoría</option>
+        </select>
+    </div>
+    <input type="submit" value="Guardar" id="Guardar" class="btn btn-primary" />
+    <input type="button" value="Inactivar" id="Inactivar" class="btn btn-danger" />
+    <a href="~/Servicios/ConsultarServicios" class="btn btn-dark">Regresar</a>
+</form>
+
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/ValidacionesGenericas 1.js"></script>
+    <script type="text/javascript">
+        $("#myform").validate({
+            rules: {
+                'nombre': {
+                    required: true
+                },
+                'descripcion': {
+                    required: true,
+                },
+                'precio': {
+                    required: true
+                },
+                'categoria': {
+                    required: true
+                },
+
+            },
+
+        });
+
+
+        function loadDropdown(url, parametros, ddl, selected) {//Parametros que va a recibir nuestra funcion
+            $.post(url, parametros, function (data) {//Elegimos el metodo por el que sera enviado
+                $(data).each(function () {
+                    var option = new Option(this.Nombre, this.Id);
+                    if (this.Id == selected) {
+                        option.selected = true;
+                    }
+                    ddl.append(option);
+                });
+            });
+        };
+
+
+        $(document).ready(function () {
+            // Interceptar el envío del formulario
+            $("#serviciosform").on("submit", function (e) {
+                e.preventDefault(); // Evitar la acción predeterminada del formulario
+
+                var form = $(this);
+                var actionUrl = form.attr('action'); // Obtiene la URL del formulario
+                var formData = form.serialize(); // Serializa los datos del formulario
+
+                // Enviar los datos mediante AJAX
+                $.post(actionUrl, formData, function (response) {
+                    // Mostrar el mensaje de SweetAlert2 basado en la respuesta
+                    Swal.fire({
+                        title: "Resultado",
+                        text: response, // Respuesta enviada por el servidor
+                        icon: response.includes("éxito") ? "success" : "error", // Ícono dinámico según el resultado
+                        confirmButtonText: "Aceptar"
+                    }).then(() => {
+                        if (response.includes("éxito")) {
+                            // Redirigir o recargar en caso de éxito
+                            window.location.href = "/Servicios/ConsultarServicios";
+                        }
+                    });
+                }).fail(function () {
+                    // En caso de error en la solicitud
+                    Swal.fire({
+                        title: "Error",
+                        text: "No se pudo procesar la solicitud. Intente nuevamente.",
+                        icon: "error",
+                        confirmButtonText: "Aceptar"
+                    });
+                });
+            });
+
+            var idServicio = @((this.Model != null) ? this.Model.idservicio : 0);
+             // Manejar la inactivación de un servicio
+            $("#Inactivar").click(function () {
+                Swal.fire({
+                    title: "¿Estás seguro?",
+                    text: "Esta acción inactivará el servicio.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sí, inactivar",
+                    cancelButtonText: "Cancelar"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.post("/Servicios/InactivarServicio", { idservicio: idServicio }) // Pasar ID como parámetro
+                            .done(function (response) {
+                                Swal.fire({
+                                    title: "Resultado",
+                                    text: response,
+                                    icon: response.includes("éxito") ? "success" : "error",
+                                    confirmButtonText: "Aceptar"
+                                }).then(() => {
+                                    if (response.includes("éxito")) {
+                                        // Recargar la página o redirigir
+                                        window.location.href = "/Servicios/ConsultarServicios";                                    }
+                                });
+                            }).fail(function () {
+                                Swal.fire({
+                                    title: "Error",
+                                    text: "No se pudo inactivar el servicio. Intente nuevamente.",
+                                    icon: "error",
+                                    confirmButtonText: "Aceptar"
+                                });
+                            });
+                    }
+                });
+            });
+
+            // Cargar categorías en el dropdown
+            var idcategoria = @((this.Model != null) ? this.Model.idcategoria : 0);
+            loadDropdown("/Servicios/DdlCategorias", {}, $("#categoria"), idcategoria);
+        });
+    </script>
+}

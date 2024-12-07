@@ -1,0 +1,129 @@
+﻿
+@{
+    ViewBag.Title = "ConsultarServicios";
+}
+<h2>Gestionar servicios</h2>
+<button id="AbrirModal" class="btn btn-primary mb-2">Crear servicio</button>
+<table id="TablaServicios" style="width:100%" class="display">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Categoría</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+</table>
+
+<div id="dialog" title="Crear Servicio">
+    @Html.Partial("CrearServicioModal")
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/ValidacionesGenericas 1.js"></script>
+    <script src="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.js"></script>
+    <script type="text/javascript">
+        var table;
+        $("#myform").validate({
+            rules: {
+                'nombre': {
+                    required: true
+                },
+                'descripcion': {
+                    required: true,
+                },
+                'precio': {
+                    required: true
+                },
+                'categoria': {
+                    required: true
+                },
+                
+            },
+
+            submitHandler: function (form) {
+                guardar();
+            }
+        });
+
+        function guardar() {
+            var data = {// Los nombres deben estar igual que en el modelo
+                nombre: $("#nombre").val(),
+                descripcion: $("#descripcion").val(),
+                precio: $("#precio").val(),
+                idcategoria: $("#categoria").val()
+            }
+
+            console.log(data);
+            $.post('/Servicios/CrearServicios', { servicio: data}, function (data) {
+                alert(data); table.ajax.url("/Servicios/ListaServicios").load();
+            });
+        }
+
+        function loadDropdown(url, parametros, ddl, selected) {//Parametros que va a recibir nuestra funcion
+            $.post(url, parametros, function (data) {//Elegimos el metodo por el que sera enviado
+                $(data).each(function () {
+                    var option = new Option(this.Nombre, this.Id);
+                    if (this.Id == selected) {
+                        option.selected = true;
+                    }
+                    ddl.append(option);
+                });
+            });
+        };
+
+        $(document).ready(function () {
+           table = new DataTable("#TablaServicios", {
+                "processing": true,
+                ajax: "/Servicios/ListaServicios",
+                columns: [
+                    { data: 'Id_servicio' },
+                    { data: 'Nombre' },
+                    { data: 'Precio' },
+                    { data: 'Categoria' },
+                    {
+                        data: 'Estado',
+                        render: function (data, type, row) {
+                            // Verificar si el valor de 'Estado' es true o false y mostrar "Activo" o "Inactivo"
+                            return data === true ? 'Activo' : 'Inactivo';
+                        }
+                    },
+                    {
+                        data: 'Id_servicio', // Asegúrate de que el ID está disponible en el objeto 'row'
+                        render: function (data, type, row) {
+                            if (row.Estado === true) {
+                                return `<a href="/Servicios/CrearServicios?id=${data}" class="btn btn-primary btn-sm">Modificar</a>`;
+                            } else {
+                                return '<span class="text-muted">No disponible</span>';
+                            }
+                        }
+                    }
+                ],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/2.1.8/i18n/es-MX.json',
+                }
+
+            });
+            loadDropdown("/Servicios/DdlCategorias", {}, $("#categoria"));//Cargamos todo el DDL
+
+
+
+            $("#dialog").dialog({
+                modal: true,
+                autoOpen: false,
+                width: 320
+            });
+
+            $("#AbrirModal").on("click", function () {
+                $("#dialog").dialog("open");
+            });
+
+            $("#cerrar").click(function () {
+                $("#dialog").dialog("close");
+            });
+        })
+    </script>
+}
+

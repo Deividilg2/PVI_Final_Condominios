@@ -3,22 +3,23 @@
 
     <div class="mb-2">
         <label for="nombre" class="form-label">Nombre</label>
-        <input type="text" id="nombre" name="nombre" class="form-control" maxlength="50" placeholder="Nombre de la casa"/>
+        <input type="text" id="nombre" name="nombre" class="form-control" maxlength="50" placeholder="Nombre de la casa" />
     </div>
 
     <div class="mb-2">
+
+        <input type="number" id="mtsCuadrados" name="mtsCuadrados" class="form-control" step="0.01" min="0" />
         <label for="mtsCuadrados" class="form-label">Metros cuadrados</label>
-        <input type="number" id="mtsCuadrados" name="mtsCuadrados" class="form-control" step="0.01" min="0"  />
     </div>
 
     <div class="mb-2">
         <label for="numHabitaciones" class="form-label">Número de habitaciones</label>
-        <input type="number" id="numHabitaciones" name="numHabitaciones" class="form-control" max="8" min="1"/>
+        <input type="text" id="numHabitaciones" name="numHabitaciones" class="form-control" max="8" min="1" />
     </div>
 
     <div class="mb-2">
         <label for="numBannos" class="form-label">Número de baños</label>
-        <input type="number" id="numBannos" name="numBannos" class="form-control" max="4" min="1"/>
+        <input type="number" id="numBannos" name="numBannos" class="form-control" max="4" min="1" />
     </div>
 
     <div class="mb-2">
@@ -34,6 +35,7 @@
     </div>
 
     <input type="submit" id="Guardado" class="btn btn-primary" value="Guardar" />
+    <input type="button" value="Cerrar" id="cerrar" class="btn btn-dark" />
 </form>
 
 

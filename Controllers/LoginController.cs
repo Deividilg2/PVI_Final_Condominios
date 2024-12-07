@@ -74,15 +74,15 @@ namespace PVI_Final_Condominios.Controllers
                                     Session["Usuario"] = usuario;//Asignamos la sesion usuario con sus atributos
                                     Session["Nombreusuario"] = usuario.nombreCompleto;
                                     Session["Empleado"] = usuario.esEmpleado;
-                                Response.Redirect("~/Cobros/ConsultarCobros", false);
-
-                                }
+                                return RedirectToAction("ConsultarCobros", "Cobros");
+                            }
                                 else
                                 {
                                     Session["Usuario"] = usuario;
                                     Session["Nombreusuario"] = usuario.nombreCompleto;
-                                    Response.Redirect($"~/Cobros/ConsultarCobros", false);
-                                }
+                                    Session["Cliente"] = usuario.esEmpleado;
+                                return RedirectToAction("ConsultarCobros", "Cobros");
+                            }
                             }
                         }
                         else

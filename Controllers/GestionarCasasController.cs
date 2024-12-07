@@ -57,16 +57,16 @@ namespace PVI_Final_Condominios.Controllers
         
         {//Creacion de una variable cobro con el modelo
             var casa = new GestionarCasasModels();
-            //if (Session["Usuario"] == null)
-            //{
-            //    Response.Redirect("~/Pages/Login.aspx");
-            //}
-            ////Creamos una instancia de Usuario para tomar los datos  del usuario
-            //LoginModels usuario = (LoginModels)Session["Usuario"];
-            //if (usuario.esEmpleado == "Cliente")//Validamos que el usuario sea un empleado para poder entrar
-            //{
-            //    Response.Redirect("~/Cobros/CrearCobros", false);
-            //}
+            if (Session["Usuario"] == null)
+            {
+                return RedirectToAction("Login", "Login");
+            }
+            //Creamos una instancia de Usuario para tomar los datos  del usuario
+            LoginModels usuario = (LoginModels)Session["Usuario"];
+            if (usuario.esEmpleado == "Cliente")//Validamos que el usuario sea un empleado para poder entrar
+            {
+                return RedirectToAction("ConsultarCobros", "Cobros");
+            }
             try
             {//Conexion a la base de datps
                 using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD

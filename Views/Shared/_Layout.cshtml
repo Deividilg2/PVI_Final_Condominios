@@ -9,11 +9,19 @@
     @Scripts.Render("~/bundles/modernizr")
     <link href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css" rel="stylesheet" />
     <link href="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
         <div class="container">
-            @Html.ActionLink("Consultar Cobros", "ConsultarCobros", "Cobros", new { area = "" }, new { @class = "navbar-brand" })
+            @if (Session["Empleado"] != null)
+            {
+                @Html.ActionLink("Consultar Cobros", "ConsultarCobros", "Cobros", new { area = "" }, new { @class = "navbar-brand" })
+            }
+            else if((Session["Cliente"] != null))
+            {
+                @Html.ActionLink("Mis Cobros", "ConsultarCobros", "Cobros", new { area = "" }, new { @class = "navbar-brand" })
+            }
             <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Alternar navegación" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -24,27 +32,27 @@
                     @if (Session["Empleado"] != null)
                     {
                         <li>@Html.ActionLink("Gestionar Casas", "ConsultarCasas", "GestionarCasas", new { area = "" }, new { @class = "nav-link" })</li>
-                        <li>@Html.ActionLink("Gestionar Servicios", "Index", "Cobros", new { area = "" }, new { @class = "nav-link" })</li>
+                        <li>@Html.ActionLink("Gestionar Servicios", "ConsultarServicios", "Servicios", new { area = "" }, new { @class = "nav-link" })</li>
                         <li>@Html.ActionLink("Contacto", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
                     }
 
                 </ul>
-                @if(Session["Nombreusuario"] != null)
+                @if (Session["Nombreusuario"] != null)
                 {
-                <div class="collapse navbar-collapse d-sm-inline-flex justify-content-end">
-                    <ul class="navbar-nav flex-grow-2">
-                        <li class="nav-link">
-                            <label ID="lblnombre" Visible="true" class="text-light" style="font-size:23px">@Html.Raw(Session["Nombreusuario"])</label>
-                        </li>
-                        <li class="nav-link">
-                            <a href="@Url.Action("CerrarSesion", "Login")" class="btn btn-danger">Cerrar Sesión</a>
-                        </li>
-                    </ul>
-                </div>
+                    <div class="collapse navbar-collapse d-sm-inline-flex justify-content-end">
+                        <ul class="navbar-nav flex-grow-2">
+                            <li class="nav-link">
+                                <label ID="lblnombre" Visible="true" class="text-light" style="font-size:23px">@Html.Raw(Session["Nombreusuario"])</label>
+                            </li>
+                            <li class="nav-link">
+                                <a href="#" class="btn btn-danger" id="cerrarSesionBtn">Cerrar Sesión</a>
+                            </li>
+                        </ul>
+                    </div>
                 }
-                
-                    
-                </div>
+
+
+            </div>
         </div>
     </nav>
     <div class="container body-content">
@@ -56,13 +64,34 @@
                 <p>&copy; @DateTime.Now.Year - Mi aplicación ASP.NET</p>
             </footer>
         </div>
-        
+
     </div>
 
     @Scripts.Render("~/bundles/jquery")
     <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.js"
-        integrity="sha256-9zljDKpE/mQxmaR4V2cGVaQ7arF3CcXxarvgr7Sj8Uc="
-        crossorigin="anonymous"></script>
+            integrity="sha256-9zljDKpE/mQxmaR4V2cGVaQ7arF3CcXxarvgr7Sj8Uc="
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    document.getElementById("cerrarSesionBtn").addEventListener("click", function (e) {
+        e.preventDefault(); // Evitar que el enlace redirija automáticamente
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Se cerrará tu sesión actual.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, cerrar sesión',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '@Url.Action("CerrarSesion", "Login")';
+            }
+        });
+    });
+    </script>
     @RenderSection("scripts", required: false)
+
 </body>
 </html>

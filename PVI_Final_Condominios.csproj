@@ -261,6 +261,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\ResultadosController.cs" />
+    <Compile Include="Controllers\ServiciosController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -273,6 +274,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>MyDatabase.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ServiciosModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -356,6 +358,10 @@
     <Content Include="Views\GestionarCasas\CrearCasasModal.cshtml" />
     <Content Include="Views\GestionarCasas\CrearCasas.cshtml" />
     <Content Include="Views\Resultados\Index.cshtml" />
+    <Content Include="Views\Servicios\ConsultarServicios.cshtml" />
+    <Content Include="Views\Servicios\CrearServicioModal.cshtml" />
+    <Content Include="Views\Servicios\CrearServicios.cshtml" />
+    <Content Include="Views\Cobros\DetalleCobros.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

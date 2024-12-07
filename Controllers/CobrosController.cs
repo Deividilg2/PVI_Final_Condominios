@@ -36,10 +36,9 @@ namespace PVI_Final_Condominios.Controllers
                     Servicios(cobro);
                 }
             }
-            catch (Exception)
+            catch
             {
 
-                throw;
             }
 
             return View();
@@ -54,7 +53,6 @@ namespace PVI_Final_Condominios.Controllers
             {
                 using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
                 {
-                    
                     //Creamos una instancia de Usuario para tomar los datos  del usuario
                     LoginModels usuario = (LoginModels)Session["Usuario"];
                     if (usuario.esEmpleado == "Cliente")//Validamos que el usuario sea un empleado para poder entrar
@@ -65,9 +63,6 @@ namespace PVI_Final_Condominios.Controllers
                     {
                         list = db.SpConsultarCobros(usuario.id, usuario.esEmpleado).ToList();//Almacenamos el resultado, del SP
                     }
-
-                    
-                    
                 }
             }
             catch

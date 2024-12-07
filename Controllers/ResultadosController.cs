@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Web;
 using System.Web.Mvc;
 
@@ -46,6 +47,18 @@ namespace PVI_Final_Condominios.Controllers
                 case "ModificarCasaM":
                     ViewBag.Text2 = "No es posible modificar esta casa ya que tiene cobros pendientes";
                     ViewBag.Link = "/GestionarCasas/ConsultarCasas";
+                    break;
+                case "ServicioInactivoM":
+                ViewBag.Text2 = "No es posible modificar este servicio ya que se encuentra inactiva";
+                ViewBag.Link = "/Servicios/ConsultarServicios";
+                break;
+                case "SevicioModificarM":
+                    ViewBag.Text2 = "El servicio que busca no se encuentra";
+                    ViewBag.Link = "/Servicios/ConsultarServicios";
+                    break;
+                case "ServicioPendienteM":
+                    ViewBag.Text2 = "El servicio no se puede modificar ya que tiene cobros pendientes";
+                    ViewBag.Link = "/Servicios/ConsultarServicios";
                     break;
             }
             return View();

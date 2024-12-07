@@ -544,31 +544,70 @@ namespace DataModels
 
 		#endregion
 
+		#region SpConsultarServicioDuplicado
+
+		public static IEnumerable<SpConsultarServicioDuplicadoResult> SpConsultarServicioDuplicado(this PviProyectoFinalDB dataConnection, string @nombre, int? @idCategoria, int? @idServicio)
+		{
+			var parameters = new []
+			{
+				new DataParameter("@nombre",      @nombre,      LinqToDB.DataType.VarChar)
+				{
+					Size = 250
+				},
+				new DataParameter("@idCategoria", @idCategoria, LinqToDB.DataType.Int32),
+				new DataParameter("@idServicio",  @idServicio,  LinqToDB.DataType.Int32)
+			};
+
+			return dataConnection.QueryProc<SpConsultarServicioDuplicadoResult>("[dbo].[sp_ConsultarServicioDuplicado]", parameters);
+		}
+
+		public partial class SpConsultarServicioDuplicadoResult
+		{
+			[Column("nombre")      ] public string Nombre         { get; set; }
+			[Column("id_categoria")] public int    Id_categoria   { get; set; }
+			                         public string Estadodecobros { get; set; }
+		}
+
+		#endregion
+
+		#region SpConsultarServicioporId
+
+		public static IEnumerable<SpConsultarServicioporIdResult> SpConsultarServicioporId(this PviProyectoFinalDB dataConnection, int? @idServicio)
+		{
+			var parameters = new []
+			{
+				new DataParameter("@idServicio", @idServicio, LinqToDB.DataType.Int32)
+			};
+
+			return dataConnection.QueryProc<SpConsultarServicioporIdResult>("[dbo].[sp_ConsultarServicioporId]", parameters);
+		}
+
+		public partial class SpConsultarServicioporIdResult
+		{
+			[Column("nombre")      ] public string  Nombre       { get; set; }
+			[Column("descripcion") ] public string  Descripcion  { get; set; }
+			[Column("precio")      ] public decimal Precio       { get; set; }
+			[Column("estado")      ] public bool    Estado       { get; set; }
+			[Column("id_categoria")] public int     Id_categoria { get; set; }
+			[Column("id_servicio") ] public int     Id_servicio  { get; set; }
+		}
+
+		#endregion
+
 		#region SpConsultarServicios
 
 		public static IEnumerable<SpConsultarServiciosResult> SpConsultarServicios(this PviProyectoFinalDB dataConnection)
 		{
-			var ms = dataConnection.MappingSchema;
-
-			return dataConnection.QueryProc(dataReader =>
-				new SpConsultarServiciosResult
-				{
-					Id_servicio  = Converter.ChangeTypeTo<int>    (dataReader.GetValue(0), ms),
-					Nombre       = Converter.ChangeTypeTo<string> (dataReader.GetValue(1), ms),
-					Precio       = Converter.ChangeTypeTo<decimal>(dataReader.GetValue(2), ms),
-					Id_categoria = Converter.ChangeTypeTo<int>    (dataReader.GetValue(3), ms),
-					Column5      = Converter.ChangeTypeTo<string> (dataReader.GetValue(4), ms),
-				},
-				"[dbo].[sp_ConsultarServicios]");
+			return dataConnection.QueryProc<SpConsultarServiciosResult>("[dbo].[sp_ConsultarServicios]");
 		}
 
 		public partial class SpConsultarServiciosResult
 		{
-			[Column("id_servicio") ] public int     Id_servicio  { get; set; }
-			[Column("nombre")      ] public string  Nombre       { get; set; }
-			[Column("precio")      ] public decimal Precio       { get; set; }
-			[Column("id_categoria")] public int     Id_categoria { get; set; }
-			[Column("nombre")      ] public string  Column5      { get; set; }
+			[Column("id_servicio")] public int     Id_servicio { get; set; }
+			[Column("nombre")     ] public string  Nombre      { get; set; }
+			[Column("precio")     ] public decimal Precio      { get; set; }
+			[Column("categoria")  ] public string  Categoria   { get; set; }
+			[Column("estado")     ] public bool    Estado      { get; set; }
 		}
 
 		#endregion
@@ -787,6 +826,29 @@ namespace DataModels
 
 		#endregion
 
+		#region SpInsertarServicio
+
+		public static int SpInsertarServicio(this PviProyectoFinalDB dataConnection, string @Nombre, string @Descripcion, decimal? @Precio, int? @IdCategoria)
+		{
+			var parameters = new []
+			{
+				new DataParameter("@Nombre",      @Nombre,      LinqToDB.DataType.VarChar)
+				{
+					Size = 250
+				},
+				new DataParameter("@Descripcion", @Descripcion, LinqToDB.DataType.VarChar)
+				{
+					Size = 250
+				},
+				new DataParameter("@Precio",      @Precio,      LinqToDB.DataType.Decimal),
+				new DataParameter("@IdCategoria", @IdCategoria, LinqToDB.DataType.Int32)
+			};
+
+			return dataConnection.ExecuteProc("[dbo].[sp_InsertarServicio]", parameters);
+		}
+
+		#endregion
+
 		#region SpLogin
 
 		public static IEnumerable<Persona> SpLogin(this PviProyectoFinalDB dataConnection, string @Email, string @Clave)
@@ -842,6 +904,26 @@ namespace DataModels
 			};
 
 			return dataConnection.ExecuteProc("[dbo].[sp_ModificarCobro]", parameters);
+		}
+
+		#endregion
+
+		#region SpModificarServicio
+
+		public static int SpModificarServicio(this PviProyectoFinalDB dataConnection, int? @idServicio, string @descripcion, decimal? @precio, bool? @Inactivar)
+		{
+			var parameters = new []
+			{
+				new DataParameter("@idServicio",  @idServicio,  LinqToDB.DataType.Int32),
+				new DataParameter("@descripcion", @descripcion, LinqToDB.DataType.VarChar)
+				{
+					Size = 250
+				},
+				new DataParameter("@precio",      @precio,      LinqToDB.DataType.Decimal),
+				new DataParameter("@Inactivar",   @Inactivar,   LinqToDB.DataType.Boolean)
+			};
+
+			return dataConnection.ExecuteProc("[dbo].[sp_ModificarServicio]", parameters);
 		}
 
 		#endregion

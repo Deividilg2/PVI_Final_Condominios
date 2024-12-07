@@ -9,19 +9,19 @@
     @Html.HiddenFor(model => model.idCasa)
     <div class="mb-3">
         <label class="form-label" for="nombreCasa">Casa</label>
-        @Html.TextBoxFor(model => model.nombreCasa, new { @class = "form-control", @disabled = "disabled" })
+        @Html.TextBoxFor(model => model.nombreCasa, new { @class = "form-control", @disabled = "disabled", maxlength = "50", placeholder = "Nombre de la casa" })
     </div>
     <div class="mb-3">
         <label class="form-label" for="metrosCuadrados">Metros Cuadrados</label>
-        @Html.TextBoxFor(model => model.metrosCuadrados, new { @class = "form-control", @disabled = "disabled" })
+        @Html.TextBoxFor(model => model.metrosCuadrados, new { @class = "form-control", @disabled = "disabled", step = "0.01", min = "0" })
     </div>
     <div class="mb-3">
         <label class="form-label" for="numeroHabitaciones">Número de habitaciónes</label>
-        @Html.TextBoxFor(model => model.numeroHabitaciones, new { @class = "form-control" })
+        @Html.TextBoxFor(model => model.numeroHabitaciones, new { @class = "form-control",  max = "8", min = "1" })
     </div>
     <div class="mb-3">
         <label class="form-label" for="numeroBannos">Número de baños</label>
-        @Html.TextBoxFor(model => model.numeroBannos, new { @class = "form-control" })
+        @Html.TextBoxFor(model => model.numeroBannos, new { @class = "form-control", max = "4", min = "1" })
     </div>
     <div class="mb-3">
         <label class="form-label" for="metrosCuadrados">Metros Cuadrados</label>
@@ -40,3 +40,27 @@
     <a href="~/GestionarCasas/ConsultarCasas" class="btn btn-dark">Regresar</a>
 </form>
 
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript">
+
+        document.getElementById("cerrarSesionBtn").addEventListener("click", function (e) {
+    e.preventDefault(); // Evitar que el enlace redirija automáticamente
+    Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Se cerrará tu sesión actual.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, cerrar sesión',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = '@Url.Action("CerrarSesion", "Login")';
+        }
+    });
+});
+    </script>
+}
