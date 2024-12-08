@@ -73,6 +73,102 @@ namespace PVI_Final_Condominios.Controllers
             return Json(new { data = list }, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult DetalleCobros(int? id)
+        {
+            if (Session["Usuario"] == null)
+            {
+                return RedirectToAction("Login", "Login");
+            }
+            var cobro = new CobrosModels();
+            LoginModels usuario = (LoginModels)Session["Usuario"];
+            //Creamos una instancia de Usuario para tomar los datos  del usuario
+
+            try
+            {//Conexion a la base de datps
+                using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
+                {//Cargamos en la variable con la estructura del modelo la consulta de los datos del cobro especifico
+                    cobro = db.SpConsultarCobroporId(id, usuario.id, usuario.esEmpleado).Select(_ => new CobrosModels
+                    {//Mapeamos los datos al modelo
+                        nombreCasa = _.Nombre_casa,
+                        nombreCliente = _.Nombre,
+                        montodetalle = _.Monto ?? 0,
+                        precioCasa = _.Precio,
+                        idcobro = _.Id_cobro,
+                        idCliente = _.Id_persona,
+                        idcasa = _.Id_casa,
+                        mes = _.Mes,
+                        anno = _.Anno,
+                        estado = _.Estado
+                    }).FirstOrDefault();//Especificamos que nos devuelva el primer resultado que deberia ser el unico
+                    if (cobro == null || new DateTime(cobro.anno, cobro.mes, 1) <= DateTime.Now
+                        || cobro.estado == "Eliminado" || cobro.estado == "Pagado")//Evitamos el ingreso a cobros que no le pertenecen a los "clientes" y
+                    {//Evitamos que se puedan modificar cobros con fecha menor o igual al periodo actual
+                        ViewBag.Visible=true;
+                    }
+                    Servicios(cobro);//Metodo que nos permite cargar la lista de los años, meses y los servicios en los Checkbox
+                }
+            }
+            catch
+            {
+
+            }
+            return View(cobro);
+        }
+
+       
+
+        public JsonResult ListaBitacora(int? id)
+        {
+            //Creamos una variable para almacenar los atributos del modelo
+            var list = new List<SpConsultarBitacoraResult>();//Variable para almacenar los datos del SP de los empleados
+            try
+            {
+                using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
+                {
+                    //Creamos una instancia de Usuario para tomar los datos  del usuario
+                    LoginModels usuario = (LoginModels)Session["Usuario"];
+                    list = db.SpConsultarBitacora(id).ToList();//Almacenamos el resultado, del SP
+                    
+                }
+            }
+            catch
+            {
+
+            }
+
+            return Json(new { data = list }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public JsonResult EliminaroPagarCobro(int idcobro, bool tipo)
+        {
+            LoginModels usuario = (LoginModels)Session["Usuario"];
+            string resultado = String.Empty;
+            try
+            {
+                using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
+                {
+                    if (tipo == false)//Eliminamos si es false
+                    {
+                        db.SpEliminaroPagarCobro(idcobro,usuario.id, tipo);
+                        resultado = "El cobro se ha eliminado con éxito";
+                    }
+                    else if (tipo == true)//Pagamos si es true
+                    {
+                        db.SpEliminaroPagarCobro(idcobro,usuario.id ,tipo);
+                        resultado = "El cobro se ha pagado con éxito";
+                    }
+                }
+            }
+            catch
+            {
+                resultado = "Se ha producido un error";
+            }
+                return Json(resultado);
+        }
+
+       
+
         //Creamos este metodo para poder realizar la carga en caso de modificacion de datos
         public ActionResult CrearCobros(int? id)
         {//Creacion de una variable cobro con el modelo
@@ -99,7 +195,8 @@ namespace PVI_Final_Condominios.Controllers
                         estado = _.Estado
                     }).FirstOrDefault();//Especificamos que nos devuelva el primer resultado que deberia ser el unico
 
-                    if (cobro == null || new DateTime(cobro.anno, cobro.mes, 1) <= DateTime.Now)//Evitamos el ingreso a cobros que no le pertenecen a los "clientes" y
+                    if (cobro == null || new DateTime(cobro.anno, cobro.mes, 1) <= DateTime.Now
+                        || cobro.estado == "Eliminado" || cobro.estado == "Pagado")//Evitamos el ingreso a cobros que no le pertenecen a los "clientes" y
                     {//Evitamos que se puedan modificar cobros con fecha menor o igual al periodo actual
                         return RedirectToAction("ConsultarCobros", "Cobros");
                     }
@@ -119,7 +216,7 @@ namespace PVI_Final_Condominios.Controllers
         public JsonResult CrearCobros(CobrosModels cobro, List<int> servicioSeleccionado)
         {
             string resultado = String.Empty;
-
+            LoginModels usuario = (LoginModels)Session["Usuario"];
             try
             {//Conexion a la base de datps
                 using (var db = new PviProyectoFinalDB("MyDatabase"))//Using para realizar la conexion con la BD
@@ -130,13 +227,13 @@ namespace PVI_Final_Condominios.Controllers
                         string serviciosSeleccionadosStr = string.Join(",", servicioSeleccionado);// Convertir la lista de servicios a una cadena separada por comas
                     if (cobro.idcobro == 0 && estadoCasa == null)
                     {
-                        db.SpInsertarCobro(cobro.idcasa, cobro.mes, cobro.anno, MontoServicios(servicioSeleccionado, cobro), serviciosSeleccionadosStr);//Tomamos el monto de una funcion
+                        db.SpInsertarCobro(cobro.idcasa, cobro.mes, cobro.anno, MontoServicios(servicioSeleccionado, cobro), serviciosSeleccionadosStr, usuario.id);//Tomamos el monto de una funcion
                         InsertarServiciosCobro(servicioSeleccionado, cobro);//Realizamos el insert de los servicios en la tabla detallecobroos
                         resultado = "El cobro se ha guardado con éxito";
                     }
                     else if(cobro.idcobro != 0)
                     {
-                        db.SpModificarCobro(cobro.idcobro, MontoServicios(servicioSeleccionado, cobro), cobro.idCliente,cobro.idcasa, serviciosSeleccionadosStr);//Modificamos unicamente el monto de los servicios
+                        db.SpModificarCobro(cobro.idcobro, MontoServicios(servicioSeleccionado, cobro),usuario.id, cobro.idcasa, serviciosSeleccionadosStr);//Modificamos unicamente el monto de los servicios
                         InsertarServiciosCobro(servicioSeleccionado, cobro);//Realizamos el insert de los servicios en la tabla detallecobroos
                         resultado = "El cobro se ha modificado con éxito";
                     }

@@ -13,12 +13,12 @@ namespace PVI_Final_Condominios.Controllers
         public ActionResult Index(string source)
         {
             //validamos sesion del usuario
-            //if (Session["Usuario"] == null)
-            //{
-            //    Response.Redirect("~/Pages/Login.aspx");
-            //}
+            if (Session["Usuario"] == null)
+            {
+                Response.Redirect("~/Pages/Login.aspx");
+            }
             //Tomamos el source para mostrar diversos mensajes de resultados BUENOS
-                switch (source)
+            switch (source)
                 {
                     case "CrearCobroB":
                         ViewBag.Text = "El cobro se ha guardado con éxito";
@@ -44,8 +44,12 @@ namespace PVI_Final_Condominios.Controllers
                     ViewBag.Text2 = "La casa que busca no existe";
                     ViewBag.Link = "/GestionarCasas/ConsultarCasas";
                     break;
-                case "ModificarCasaM":
+                case "CasaCobroPendienteM":
                     ViewBag.Text2 = "No es posible modificar esta casa ya que tiene cobros pendientes";
+                    ViewBag.Link = "/GestionarCasas/ConsultarCasas";
+                    break;
+                case "CasaInactivaM":
+                    ViewBag.Text2 = "No es posible modificar esta casa ya que se encuentra inactiva";
                     ViewBag.Link = "/GestionarCasas/ConsultarCasas";
                     break;
                 case "ServicioInactivoM":
@@ -60,6 +64,7 @@ namespace PVI_Final_Condominios.Controllers
                     ViewBag.Text2 = "El servicio no se puede modificar ya que tiene cobros pendientes";
                     ViewBag.Link = "/Servicios/ConsultarServicios";
                     break;
+
             }
             return View();
         }

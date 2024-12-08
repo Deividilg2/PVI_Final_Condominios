@@ -76,6 +76,9 @@ namespace PVI_Final_Condominios.Controllers
                     if(estadopendiente != null)
                     {
                         return RedirectToAction("Index", "Resultados", new { source = "ServicioPendienteM" });
+                    } else if (servicio.estado == false)
+                    {
+                        return RedirectToAction("Index", "Resultados", new { source = "ServicioInactivoM" });
                     }
                     
                 }

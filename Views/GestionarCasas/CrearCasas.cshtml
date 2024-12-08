@@ -1,11 +1,11 @@
 ﻿@model PVI_Final_Condominios.Models.GestionarCasasModels
 @{
-    ViewBag.Title = "ModificarCasas";
+    ViewBag.Title = "CrearCasas";
 }
 
 <h2>ModificarCasas</h2>
 
-<form method="post" id="casasform">
+<form method="post" id="casasform" action="/GestionarCasas/CrearCasas">
     @Html.HiddenFor(model => model.idCasa)
     <div class="mb-3">
         <label class="form-label" for="nombreCasa">Casa</label>
@@ -45,22 +45,79 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript">
 
-        document.getElementById("cerrarSesionBtn").addEventListener("click", function (e) {
-    e.preventDefault(); // Evitar que el enlace redirija automáticamente
-    Swal.fire({
-        title: '¿Estás seguro?',
-        text: "Se cerrará tu sesión actual.",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sí, cerrar sesión',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            window.location.href = '@Url.Action("CerrarSesion", "Login")';
-        }
-    });
-});
+        $(document).ready(function () {
+
+            $("#casasform").on("submit", function (e) {
+                e.preventDefault(); // Evitar la acción predeterminada del formulario
+
+                var form = $(this);
+                var actionUrl = form.attr('action'); // Obtiene la URL del formulario
+                var formData = form.serialize(); // Serializa los datos del formulario
+
+                // Enviar los datos mediante AJAX
+                $.post(actionUrl, formData, function (response) {
+                    // Mostrar el mensaje de SweetAlert2 basado en la respuesta
+                    Swal.fire({
+                        title: "Resultado",
+                        text: response, // Respuesta enviada por el servidor
+                        icon: response.includes("éxito") ? "success" : "error", // Ícono dinámico según el resultado
+                        confirmButtonText: "Aceptar"
+                    }).then(() => {
+                        if (response.includes("éxito")) {
+                            // Redirigir o recargar en caso de éxito
+                            window.location.href = "/GestionarCasas/ConsultarCasas";
+                        }
+                    });
+                }).fail(function () {
+                    // En caso de error en la solicitud
+                    Swal.fire({
+                        title: "Error",
+                        text: "No se pudo procesar la solicitud. Intente nuevamente.",
+                        icon: "error",
+                        confirmButtonText: "Aceptar"
+                    });
+                });
+            });
+
+
+            var idcasa = @((this.Model != null) ? this.Model.idCasa : 0);
+             // Manejar la inactivación de un servicio
+            $("#Inactivar").click(function () {
+                Swal.fire({
+                    title: "¿Estás seguro?",
+                    text: "Esta acción inactivará la casa.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sí, inactivar",
+                    cancelButtonText: "Cancelar"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.post("/GestionarCasas/InactivarCasa", { idcasa: idcasa }) // Pasar ID como parámetro
+                            .done(function (response) {
+                                Swal.fire({
+                                    title: "Resultado",
+                                    text: response,
+                                    icon: response.includes("éxito") ? "success" : "error",
+                                    confirmButtonText: "Aceptar"
+                                }).then(() => {
+                                    if (response.includes("éxito")) {
+                                        // Recargar la página o redirigir
+                                        window.location.href = "/GestionarCasas/ConsultarCasas";                                    }
+                                });
+                            }).fail(function () {
+                                Swal.fire({
+                                    title: "Error",
+                                    text: "No se pudo inactivar la casa. Intente nuevamente.",
+                                    icon: "error",
+                                    confirmButtonText: "Aceptar"
+                                });
+                            });
+                    }
+                });
+            });
+
+
+        });
+
     </script>
 }

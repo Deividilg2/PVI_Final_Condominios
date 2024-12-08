@@ -154,18 +154,7 @@ else
                         {
                             data: 'Id_cobro', // Asegúrate de que el ID está disponible en el objeto 'row'
                             render: function (data, type, row) {
-                                // Convertimos año y mes a formato Date
-                                const cobroDate = new Date(Number(row.Anno), Number(row.Mes) - 1);
-                                const currentDate = new Date();
-                                // Validamos estados y fecha del cobro
-                                if (
-                                    row.Estado === 'Pagado' ||
-                                    row.Estado === 'Eliminado' ||
-                                    cobroDate <= currentDate) {
-                                    return '<span class="text-muted">No disponible</span>';
-                                } else {
-                                    return `<a href="/Cobros/CrearCobros?id=${data}" class="btn btn-primary btn-sm">Consultar</a>`;
-                                }
+                            return `<a href="/Cobros/DetalleCobros?id=${data}" class="btn btn-primary btn-sm">Consultar</a>`;
                             }
                         }
                     ],

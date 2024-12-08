@@ -80,15 +80,20 @@ namespace PVI_Final_Condominios.Controllers
                         numeroBannos = _.Numero_banos,
                         idPersona = _.Id_persona,
                         fechaConstruccion = DateTime.Parse(_.Fecha_construccion.ToString("dd-MM-yyyy")),
-                        estado = (_.Estadodecobros=="Pendiente")
+                        estadocobro = (_.Estadodecobros=="Pendiente"),
+                        estado = (_.Estado==true)
                     }).FirstOrDefault();//Especificamos que nos devuelva el primer resultado que deberia ser el unico
-                    if (casa == null)
+                    if (casa == null)//La casa no existe
                     {
                         return RedirectToAction("Index", "Resultados", new { source = "BuscarCasaM" });
-                    }else if (casa != null && casa.estado == true)
+                    }else if ( casa.estadocobro == true)//La casa tiene cobros pendientes
                     {
-                        return RedirectToAction("Index", "Resultados", new { source = "ModificarCasaM" });
+                        return RedirectToAction("Index", "Resultados", new { source = "CasaCobroPendienteM" });
+                    }else if (casa.estado == false)
+                    {
+                        return RedirectToAction("Index", "Resultados", new { source = "CasaInactivaM" });
                     }
+                    
 
                 }
             }
@@ -114,7 +119,7 @@ namespace PVI_Final_Condominios.Controllers
                         {
                             db.SpInsertarCasa(casa.nombreCasa, casa.metrosCuadrados, casa.numeroHabitaciones,
                             casa.numeroBannos, PrecioCasa(casa), casa.idPersona, casa.fechaConstruccion);
-                            resultado = "Se ha logrado guardar con exito";
+                            resultado = "Se ha logrado guardar con éxito";
                         }
                         else
                         {
@@ -124,12 +129,31 @@ namespace PVI_Final_Condominios.Controllers
                     {
                         db.SpModificarCasa(casa.idCasa,casa.numeroHabitaciones,
                         casa.numeroBannos, PrecioCasa(casa));
-                        resultado = "Se ha logrado modificar con exito";
+                        resultado = "Se ha logrado modificar con éxito";
                     }
                 }
             }
             catch
             {
+            }
+            return Json(resultado);
+        }
+
+        [HttpPost]
+        public JsonResult InactivarCasa(int idcasa)
+        {
+            string resultado = String.Empty;
+            try
+            {
+                using (var db = new PviProyectoFinalDB("MyDatabase"))
+                {
+                    db.SpInactivarCasa(idcasa);
+                    resultado = "Casa inactivada con éxito";
+                }
+            }
+            catch
+            {
+                resultado = "No se ha logrado inactivar la casa";
             }
             return Json(resultado);
         }

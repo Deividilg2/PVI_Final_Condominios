@@ -14,7 +14,8 @@ namespace PVI_Final_Condominios.Models
         public int numeroBannos { get; set; }
         public int idPersona { get; set; }
         public DateTime fechaConstruccion { get; set; }
-        public bool estado { get; set; }
+        public bool estadocobro { get; set; }
+        public bool estado {  get; set; }
 
     }
 }

@@ -1,6 +1,314 @@
-﻿@{
+﻿@model PVI_Final_Condominios.Models.CobrosModels
+
+@{
     ViewBag.Title = "DetalleCobros";
+
+    string GetMonthName(int month)
+    {
+        var monthNames = new[]
+        {
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    };
+        return month >= 1 && month <= 12 ? monthNames[month - 1] : "Mes inválido";
+    }
 }
+<style>
+    .detalle-cobro {
+        width: 50%;
+        border-collapse: collapse;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+    }
 
-<h2>DetalleCobros</h2>
+        .detalle-cobro th, .detalle-cobro td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
 
+        .detalle-cobro th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+    #TablaBitacora th, #TablaBitacora td {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    #TablaBitacora th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #4CAF50;
+        color: white;
+    }
+</style>
+
+
+<h2>Detalle del cobro</h2>
+<div class="mb-3">
+    <table class="detalle-cobro">
+        <tr>
+            <th># Cobro</th>
+            <td>@Model.idcobro</td>
+        </tr>
+        <tr>
+            <th>Propietario</th>
+            <td>@Model.nombreCliente</td>
+        </tr>
+        <tr>
+            <th>Nombre Casa</th>
+            <td>@Model.nombreCasa</td>
+        </tr>
+        <tr>
+            <th>Monto Cobro</th>
+            <td>@Model.montodetalle</td>
+        </tr>
+        <tr>
+            <th>Precio Casa</th>
+            <td>@Model.precioCasa</td>
+        </tr>
+        <tr>
+            <th>Periodo</th>
+            <td>@GetMonthName(Model.mes) - @Model.anno</td>
+        </tr>
+        <tr>
+            <th>Estado</th>
+            <td>@Model.estado</td>
+        </tr>
+    </table>
+
+</div>
+
+
+<h4>Servicios</h4>
+
+<div class="mt-2">
+    @foreach (var servicio in ViewBag.servicios)
+    {
+        <div class="mt-1">
+            @*El atributo "name" es el que pasamos abajo en el js para definir que es requerido para poder guardar*@
+            <input disabled type="checkbox" id="servicioSeleccionado_@servicio.Id_servicio" name="servicios" value="@servicio.Id_servicio"
+                   @(ViewBag.serviciosSeleccionados != null && (ViewBag.serviciosSeleccionados).Contains(servicio.Id_servicio) ? "checked" : "") /> 
+    @*verificamos un valor específico dentro de la lista con Contains() en este caso es Id_servicio*@
+            <label class="form-label" for="servicioSeleccionado_@servicio.Id_servicio">@servicio.Column4 : @servicio.Nombre</label>
+            </div>
+    }
+</div>
+
+
+<div class="mb-2">
+    @if (Session["Empleado"] != null)
+    {
+        <input type="button" id="Editar" value="Editar" class="btn btn-primary"/>
+        <input type="button" id="Pagar" value="Pagar" class="btn btn-success" />
+        <input type="button" id="Eliminar" value="Eliminar" class="btn btn-danger" />
+    }
+
+    <a href="/Cobros/ConsultarCobros" class="btn btn-dark m-sm-2">Regresar</a>
+</div>
+
+
+
+<hr />
+
+<h4>Lista de acciones realizadas</h4>
+
+<table id="TablaBitacora" style="width:100%" class="display">
+    <thead>
+        <tr>
+            <th>Fecha y hora</th>
+            <th>Descripción</th>
+            <th>Realizado por</th>
+        </tr>
+    </thead>
+</table>
+
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Scripts/ValidacionesGenericas 1.js"></script>
+    <script src="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.js"></script>
+    <script type="text/javascript">
+        var estadoCobro = '@Model.estado';
+        // Convertimos año y mes a formato Date
+        var anno = '@Model.anno';
+        var mes = '@Model.mes';
+        const cobroDate = new Date(Number(anno), Number(mes) - 1);
+        const currentDate = new Date();
+
+        var idcobro = @Html.Raw((this.Model != null) ? this.Model.idcobro : 0);
+        console.log(idcobro)
+        $(document).ready(function () {
+            $('#Editar').on('click', function() {
+            // Verifica si el estado es 'Pagado' o 'Eliminado'
+                if ('@Model.estado' == 'Pagado' || '@Model.estado' == 'Eliminado') {
+                // Muestra la alerta con SweetAlert2
+                Swal.fire({
+                    title: 'No se puede editar',
+                    text: 'Este cobro ya está '+estadoCobro+'.',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+                } else if (cobroDate <= currentDate) {
+                    Swal.fire({
+                        title: "Cobro antiguo",
+                        text: "Este cobro es antiguo, no es posible modificarlo.",
+                        icon: "error",
+                        confirmButtonText: "Aceptar"
+                    });
+
+                }  else {
+                    // Si el estado no es Pagado o Eliminado, continúa con la acción
+                    window.location.href = '/Cobros/CrearCobros/@Model.idcobro'; // Redirige al enlace de edición
+                }
+
+            });
+
+            $("#Eliminar").click(function () {
+                // Verificar si el estado del cobro es "Eliminado"
+                if ("@Model.estado" === "Eliminado" || "@Model.estado" === "Pagado") {
+                    Swal.fire({
+                        title: "Estado ya actualizado",
+                        text: "Este cobro ya está " + estadoCobro + ".",
+                        icon: "info",
+                        confirmButtonText: "Aceptar"
+                    });
+                } else if (cobroDate <= currentDate) {
+                    Swal.fire({
+                        title: "Cobro antiguo",
+                        text: "Este cobro es antiguo, no es posible modificarlo.",
+                        icon: "error",
+                        confirmButtonText: "Aceptar"
+                    });
+
+                } else {
+                    Swal.fire({
+                        title: "¿Estás seguro?",
+                        text: "Esta acción eliminará el cobro.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: "Sí, eliminar",
+                        cancelButtonText: "Cancelar"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.post("/Cobros/EliminaroPagarCobro", { idcobro: idcobro, tipo: false}) // Pasar ID como parámetro
+                                .done(function (response) {
+                                    Swal.fire({
+                                        title: "Resultado",
+                                        text: response,
+                                        icon: response.includes("éxito") ? "success" : "error",
+                                        confirmButtonText: "Aceptar"
+                                    }).then(() => {
+                                        if (response.includes("éxito")) {
+                                            // Recargar la página o redirigir
+                                            window.location.href = "/Cobros/DetalleCobros/@Model.idcobro";
+                                        }
+                                    });
+                                }).fail(function () {
+                                    Swal.fire({
+                                        title: "Error",
+                                        text: "No se pudo eliminar el cobro. Intente nuevamente.",
+                                        icon: "error",
+                                        confirmButtonText: "Aceptar"
+                                    });
+                                });
+                        }
+                    });
+                }
+            });
+
+            $("#Pagar").click(function () {
+
+                if ("@Model.estado" === "Pagado" || "@Model.estado" === "Eliminado") {
+                    Swal.fire({
+                        title: "Estado ya actualizado",
+                        text: "Este cobro ya está " + estadoCobro + ".",
+                        icon: "info",
+                        confirmButtonText: "Aceptar"
+                    });
+                } else if (cobroDate <= currentDate) {
+                    Swal.fire({
+                        title: "Cobro antiguo",
+                        text: "Este cobro es antiguo, no es posible modificarlo.",
+                        icon: "error",
+                        confirmButtonText: "Aceptar"
+                    });
+
+                } else {
+                    Swal.fire({
+                        title: "¿Deseas pagar este cobro?",
+                        text: "Esta acción cambia el estado del cobro a Pagado.",
+                        icon: "question",
+                        showCancelButton: true,
+                        confirmButtonColor: '#1eb517',
+                        cancelButtonColor: '#0f0601',
+                        confirmButtonText: "Sí, pagar",
+                        cancelButtonText: "Cancelar"
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.post("/Cobros/EliminaroPagarCobro", { idcobro: idcobro, tipo: true }) // Pasar ID como parámetro
+                                .done(function (response) {
+                                    Swal.fire({
+                                        title: "Resultado",
+                                        text: response,
+                                        icon: response.includes("éxito") ? "success" : "error",
+                                        confirmButtonText: "Aceptar"
+                                    }).then(() => {
+                                        if (response.includes("éxito")) {
+                                            // Recargar la página o redirigir
+                                            window.location.href = "/Cobros/DetalleCobros/@Model.idcobro";
+                                        }
+                                    });
+                                }).fail(function () {
+                                    Swal.fire({
+                                        title: "Error",
+                                        text: "No se pudo pagar el cobro. Intente nuevamente.",
+                                        icon: "error",
+                                        confirmButtonText: "Aceptar"
+                                    });
+                                });
+                        }
+                    });
+                }
+            });
+
+
+            // Inicializar DataTable
+            $('#TablaBitacora').DataTable({
+                "ajax": {
+                    "url": "/Cobros/ListaBitacora", // Ruta del método en el controlador
+                    "type": "GET", // Método de solicitud
+                    "data": { id: idcobro }, // Parámetro que envías al método (puedes reemplazar 123 con un valor dinámico)
+                    "dataSrc": "data" // Propiedad del objeto JSON que contiene los datos
+                },
+                "columns": [
+                    {
+                        data: 'Fecha',
+                        render: function (data, type, row) {
+                            // Verifica si la fecha está en el formato /Date(XXXXXXXX)/ y convierte
+                            if (data && data.includes("/Date")) {
+                                var timestamp = data.match(/\d+/)[0]; // Extrae el timestamp
+                                var date = new Date(parseInt(timestamp)); // Convierte el timestamp a fecha
+                                var formattedDate = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + '-' +
+                                    (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : (date.getMonth() + 1)) + '-' +
+                                    date.getFullYear(); // Formatea la fecha como dd/mm/yyyy
+                                return formattedDate;
+                            }
+                            return data; // Si no tiene formato /Date, retorna el valor original
+                        }
+                    },
+                    { "data": "Detalle" },
+                    { "data": "Nombre" }
+                ],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-MX.json" // Configuración de idioma
+                }
+            });
+
+
+        });
+    </script>
+}

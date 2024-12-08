@@ -6,7 +6,7 @@
 
 <h2>Crear Cobros</h2>
 
-<form method="post" id="myform">
+<form method="post" id="myform" action="/Cobros/CrearCobros">
     @Html.HiddenFor(model => model.idcobro)
     <div class="md-3">
         <label class="form-label" for="idCliente">Cliente</label>
@@ -52,7 +52,7 @@
     </div>
 
     <input type="submit" id="Guardado" class="btn btn-primary" value="Guardar" />
-    <a href="/Cobros/ConsultarCobros" class="btn btn-secondary">Regresar</a>
+    <a href="/Cobros/DetalleCobros/@Model.idcobro" class="btn btn-secondary">Regresar</a>
 </form>
 
 
@@ -109,7 +109,25 @@
 
              console.log(data, serviciosSeleccionados);
              $.post('/Cobros/CrearCobros', { cobro: data, servicioSeleccionado: serviciosSeleccionados }, function (data) {
-                 alert(data);
+                 Swal.fire({
+                     title: "Resultado",
+                     text: data, // Respuesta enviada por el servidor
+                     icon: data.includes("éxito") ? "success" : "error", // Ícono dinámico según el resultado
+                     confirmButtonText: "Aceptar"
+                 }).then(() => {
+                     if (data.includes("éxito")) {
+                         // Redirigir o recargar en caso de éxito
+                         window.location.href = "/Cobros/DetalleCobros/@Model.idcobro";
+                     }
+                 });
+             }).fail(function () {
+                 // En caso de error en la solicitud
+                 Swal.fire({
+                     title: "Error",
+                     text: "No se pudo procesar la solicitud. Intente nuevamente.",
+                     icon: "error",
+                     confirmButtonText: "Aceptar"
+                 });
              });
          }
 
@@ -139,7 +157,14 @@
                 loadDropdown("/Cobros/DdlCasas", { Id: idcliente }, $("#idCasa"), idcasa);
             }
             loadDropdown("/Cobros/DdlAnnos", {}, $("#anno"), anno);
-            loadDropdown("/Cobros/DdlMeses", {}, $("#mes"), mes);            
+            loadDropdown("/Cobros/DdlMeses", {}, $("#mes"), mes);    
+
+
+
+
+            
+
+
         });
 
     </script>

@@ -68,7 +68,7 @@
 
             console.log(data);
             $.post('/GestionarCasas/CrearCasas', { casa: data}, function (data) {
-                alert(data); table.ajax.url("/Servicios/ListaCasas").load();
+                alert(data); table.ajax.url("/GestionarCasas/ListaCasas").load();
             });
         }
 
